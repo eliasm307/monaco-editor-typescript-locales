@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "importHelpers": true,
+    "removeComments": true,
+    "allowJs": true,
+    "alwaysStrict": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "lib": ["esnext", "DOM"], // using "DOM" to get "fetch" types as @types/node@18 doesn't have them
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "esnext",
+    "declaration": true,
+    "sourceMap": true,
+    "incremental": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true,
+    "allowSyntheticDefaultImports": true,
+    "downlevelIteration": true,
+    "baseUrl": ".",
+    "types": ["node"]
+  },
+  "exclude": ["node_modules", "**/node_modules/**"],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS",
+      "target": "ES2022"
+    }
+  }
+}

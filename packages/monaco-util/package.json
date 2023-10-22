@@ -1,0 +1,46 @@
+{
+  "name": "monaco-editor-typescript-locales",
+  "version": "0.0.1",
+  "description": "A utility to translate diagnostic messages from the Monaco Editor TypeScript worker into different locales",
+  "author": "Elias Mangoro",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eliasm307/monaco-editor-typescript-locales.git"
+  },
+  "bugs": {
+    "url": "https://github.com/eliasm307/monaco-editor-typescript-locales/issues"
+  },
+  "homepage": "https://github.com/eliasm307/monaco-editor-typescript-locales#readme",
+  "keywords": [
+    "monaco",
+    "monaco-editor",
+    "typescript",
+    "locales",
+    "i18n"
+  ],
+  "scripts": {
+    "get-messages": "node ./src/scripts/get-locale-diagnostic-messages.js",
+    "build": "echo 'Building...' && tsc -p tsconfig.build.json",
+    "prepublish:base": "echo 'Making sure TypeScript is up to date...' && yarn --top-level run upgrade && yarn --top-level run lint && npm run build",
+    "publish:base": "cross-env GIT_RELATIVE_CWD=../.. NPM_RELATIVE_CWD=. node ../../@eliasm307/config/dist/scripts/publish.js",
+    "publish:patch": "npm run publish:base -- patch",
+    "publish:minor": "npm run publish:base -- minor",
+    "publish:major": "npm run publish:base -- major"
+  },
+  "peerDependencies": {
+    "monaco-editor": ">=0.34.0"
+  },
+  "peerDependenciesNotes": {
+    "monaco-editor": "v0.34.0 is when the #removeAllMarkers method was introduced which this package relies on."
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "glob": "^10.3.10",
+    "monaco-editor": "^0.44.0"
+  },
+  "files": [
+    "dist",
+    "locales"
+  ]
+}
