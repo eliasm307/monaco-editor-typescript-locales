@@ -2,7 +2,7 @@
 
 import { Box, Grid, HStack, Heading, Select, Text, VStack } from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
-import setLanguageLocale from "monaco-editor-typescript-locales/src/index";
+import { register } from "monaco-editor-typescript-locales/src/index";
 import localesMetadata from "monaco-editor-typescript-locales/locales/metadata.json";
 import { useEffect, useRef } from "react";
 import { editor } from "monaco-editor";
@@ -91,11 +91,20 @@ function EditorPane({ languageId, defaultLocale }: EditorPaneProps) {
           defaultValue={defaultLocale}
           onChange={(event) => {
             if (!monacoRef.current) return;
-            setLanguageLocale({
+            const languageDefaults = getLanguageIdDefaults({
               monaco: monacoRef.current,
               languageId,
+            });
+
+            languageDefaults.setCompilerOptions({
+              ...languageDefaults.getCompilerOptions(),
               locale: event.target.value,
             });
+            // setLanguageLocale({
+            //   monaco: monacoRef.current,
+            //   model: languageId,
+            //   locale: event.target.value,
+            // });
           }}
         >
           {localesMetadata.availableLocales.map((locale) => (
@@ -118,7 +127,8 @@ function EditorPane({ languageId, defaultLocale }: EditorPaneProps) {
         beforeMount={(monaco) => {
           monacoRef.current = monaco;
           if (defaultLocale) {
-            setLanguageLocale({ monaco, languageId, locale: defaultLocale });
+            register(monacoRef.current);
+            // setLanguageLocale({ monaco, model: languageId, locale: defaultLocale });
           }
         }}
         onMount={(editor) => {
@@ -129,4 +139,21 @@ function EditorPane({ languageId, defaultLocale }: EditorPaneProps) {
       />
     </VStack>
   );
+}
+
+function getLanguageIdDefaults({
+  monaco,
+  languageId,
+}: {
+  monaco: typeof import("monaco-editor");
+  languageId: string;
+}) {
+  switch (languageId) {
+    case "typescript":
+      return monaco.languages.typescript.typescriptDefaults;
+    case "javascript":
+      return monaco.languages.typescript.javascriptDefaults;
+    default:
+      throw Error(`Unsupported language ID "${languageId}"`);
+  }
 }
