@@ -1,17 +1,6 @@
 /* eslint-disable functional-core/purity */
-/* eslint-disable import/no-duplicates */
 import type { editor } from "monaco-editor";
-import type * as _monacoReferenceForTypes from "monaco-editor";
 import { escapeRegExp } from "./utils";
-
-// monaco overview https://microsoft.github.io/monaco-editor/
-/*
-    some supported functionality:
-    https://code.visualstudio.com/docs/editor/codebasics
-    https://code.visualstudio.com/docs/editor/editingevolved
-    https://code.visualstudio.com/docs/editor/intellisense
-
-*/
 
 const TYPESCRIPT_WORKER_LANGUAGE_IDS = ["typescript", "javascript"] as const;
 
@@ -19,15 +8,13 @@ type LanguageId = (typeof TYPESCRIPT_WORKER_LANGUAGE_IDS)[number];
 
 type MessageTemplatesMap = Record<number, string>;
 
-type MonacoModule = typeof _monacoReferenceForTypes;
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+type MonacoModule = typeof import("monaco-editor");
 
 /**
- * Not sure if its possible to have multiple Monaco api instances
- * and this is to make sure we only initialise each instance once
+ * This is to make sure we only initialise each instance once
  */
 const initialisedMonacoInstances = new WeakSet<MonacoModule>();
-
-// todo test languages can be set independently for JS and TS, show this in the demo as side by side editors
 
 /**
  * Sets up the given Monaco instance to translate any JS/TS diagnostic marker messages to the locale configured for the language in the compiler options.
@@ -40,14 +27,16 @@ const initialisedMonacoInstances = new WeakSet<MonacoModule>();
  *
  * @remark This is idempotent and will only initialise a given Monaco instance once when called multiple times.
  */
-export default function initialiseMonacoInstance(monaco: MonacoModule): void {
-  if (!initialisedMonacoInstances.has(monaco)) {
+function initIfRequired(monaco: MonacoModule): void {
+  if (initialisedMonacoInstances.has(monaco)) {
     return; // already initialised
   }
 
   // setup JS/TS message translation listener and handler
   // NOTE: assuming monaco fires this with debouncing etc so its performant to handle this directly without further buffering etc
   monaco.editor.onDidChangeMarkers((modelUris) => {
+    // todo since the method to remove markers works on all models,
+    // so  when we translate the markers we need to consider all the models at the same time to produce one set of output markers
     modelUris.forEach((uri) => {
       const model = monaco.editor.getModel(uri);
       if (model) {
@@ -57,6 +46,34 @@ export default function initialiseMonacoInstance(monaco: MonacoModule): void {
   });
 }
 
+export default function setLanguageLocale({
+  monaco,
+  languageId,
+  locale,
+}: {
+  monaco: MonacoModule;
+  languageId: "javascript" | "typescript";
+  locale: string;
+}) {
+  initIfRequired(monaco);
+
+  let defaults = monaco.languages.typescript.typescriptDefaults;
+  if (languageId === "javascript") {
+    defaults = monaco.languages.typescript.javascriptDefaults;
+  }
+
+  const currentLocale = defaults.getCompilerOptions().locale;
+  if (currentLocale) {
+    // Remove all markers from previous locale
+    monaco.editor.removeAllMarkers(`${languageId}-${currentLocale}`);
+  }
+
+  const existingCompilerOptions = defaults.getCompilerOptions();
+  defaults.setCompilerOptions({ ...existingCompilerOptions, locale });
+}
+
+// todo instead of driving this from language settings which means all models are affected by a locale change,
+// we could track individual locales for each model so each model can have its own locale
 function getConfiguredLocaleForLanguage({
   monaco,
   languageId,
@@ -86,15 +103,18 @@ async function translateDiagnosticMessageMarkers({
     return; // only TS/JS messages supported
   }
 
+  // todo investigate issue when there are multiple editors and markers are doubled up
+
   // NOTE: assumes the JS/TS messages will always have the owner for their markers set as the language ID
   const originalMarkers = monaco.editor.getModelMarkers({ owner: languageId });
   if (!originalMarkers.length) {
     return; // no markers to translate or we already translated them
   }
+  console.log("translateDiagnosticMessageMarkers", { languageId, originalMarkers });
 
   const targetLocale = getConfiguredLocaleForLanguage({ monaco, languageId });
   if (!targetLocale || targetLocale === "en") {
-    return; // dont need to translate
+    return; // don't need to translate
   }
 
   try {

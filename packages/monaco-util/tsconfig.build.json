@@ -1,9 +1,13 @@
 {
-  "extends": "../../tsconfig.build.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "noEmit": false,
     "outDir": "dist",
     "sourceMap": false,
-    "baseUrl": "."
-  }
+    "declaration": true,
+    "importHelpers": true,
+    "removeComments": false
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

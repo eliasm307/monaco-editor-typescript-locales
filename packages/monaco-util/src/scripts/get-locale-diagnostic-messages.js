@@ -23,7 +23,7 @@ const LOCALES_METADATA_FILE_PATH = path.join(LOCALES_DIR, "metadata.json");
 async function main() {
   await generateEnglishDiagnosticMessages();
 
-  copyLocaleDiagnosticMessagesFromNodeModules();
+  copyLocaleDiagnosticMessagesFromNodeModulesAndCreateMetadata();
 }
 
 main().then(() => console.log("DONE"));
@@ -31,7 +31,7 @@ main().then(() => console.log("DONE"));
 /**
  * Non english locale messages are included in the typescript distribution in node_modules, so copy them to our folder
  */
-function copyLocaleDiagnosticMessagesFromNodeModules() {
+function copyLocaleDiagnosticMessagesFromNodeModulesAndCreateMetadata() {
   const localeDiagnosticMessagesFilePaths = glob.sync(
     `*/${DIAGNOSTIC_MESSAGES_FILE_NAME_WITH_EXT}`,
     {
@@ -39,6 +39,8 @@ function copyLocaleDiagnosticMessagesFromNodeModules() {
       absolute: true,
     },
   );
+
+  let availableLocales = ["en"];
 
   // copy each locale messages file to our locales folder
   for (const localeDiagnosticMessagesFilePath of localeDiagnosticMessagesFilePaths) {
@@ -49,13 +51,18 @@ function copyLocaleDiagnosticMessagesFromNodeModules() {
     console.log(
       `Copied "${locale}" diagnostic messages \n\tfrom "${localeDiagnosticMessagesFilePath}" \n\tto ${destinationPath}`,
     );
+    availableLocales.push(locale);
   }
 
   ensureFileExistsAndWrite({
     filePath: LOCALES_METADATA_FILE_PATH,
     // NOTE: the version is accurate for non-english locales from our node_modules,
     // however english messages are fetched from latest source code, so assume they are compatible with atleast this version
-    content: JSON.stringify({ generatedFromTypescriptVersion: typescriptVersion }, null, 2),
+    content: JSON.stringify(
+      { generatedFromTypescriptVersion: typescriptVersion, availableLocales },
+      null,
+      2,
+    ),
   });
 }
 

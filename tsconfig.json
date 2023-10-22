@@ -1,8 +1,6 @@
 {
   "compilerOptions": {
     "checkJs": true,
-    "importHelpers": true,
-    "removeComments": true,
     "allowJs": true,
     "alwaysStrict": true,
     "esModuleInterop": true,
@@ -28,10 +26,9 @@
     "strictPropertyInitialization": true,
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
-    "baseUrl": ".",
     "types": ["node"]
   },
-  "exclude": ["node_modules", "**/node_modules/**"],
+  "exclude": ["node_modules", "**/node_modules/**", "**/dist/**"],
   "ts-node": {
     "compilerOptions": {
       "module": "CommonJS",
