@@ -12,13 +12,11 @@ import {
   Tooltip,
   VStack,
 } from "@chakra-ui/react";
-import { loader } from "@monaco-editor/react";
+import { Editor, loader } from "@monaco-editor/react";
+import { register } from "monaco-editor-typescript-locales/src/index";
 import localesMetadata from "monaco-editor-typescript-locales/locales/metadata.json";
 import { useEffect, useRef, useState } from "react";
 import { Colours } from "./constants";
-import EditorPanel, { EditorPanelProps } from "@packages/common/src/components/EditorPanel";
-
-// todo update icons
 
 const BREAK_POINT = "md";
 
@@ -34,7 +32,6 @@ function setLocaleInUrl(locale: string) {
   urlParams.set("locale", locale);
   window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}`);
 
-  // todo make this configurable so it can be disabled if Monaco localisation is not needed
   // NOTE: need to reload so `loader` can be reinitialized with the new locale
   window.location.reload();
 }
@@ -91,22 +88,6 @@ function Header({ locale, setLocale }: { locale: string; setLocale: (locale: str
   );
 }
 
-const JS_CODE_WITH_ISSUES = `const str: number = "";
-
-const function = 5;
-
-const a: str = 1;
-
-c =;
-
-return;
-
-fnc() {
-  // this produces a parser error message below,
-  // not from the Typescript worker,
-  // which doesn't get translated
-`;
-
 function Editors({ locale, setLocale }: { locale: string; setLocale: (locale: string) => void }) {
   const [state, setState] = useState<"idle" | "loading">("idle");
 
@@ -137,13 +118,6 @@ function Editors({ locale, setLocale }: { locale: string; setLocale: (locale: st
       </Center>
     );
 
-  const baseEditorPanelProps: Partial<EditorPanelProps> = {
-    height: {
-      base: "auto",
-      [BREAK_POINT]: "100%",
-    },
-  };
-
   return (
     <Grid
       className='editors-container'
@@ -159,25 +133,29 @@ function Editors({ locale, setLocale }: { locale: string; setLocale: (locale: st
       gap={3}
       p={3}
     >
-      <EditorPanel
-        {...baseEditorPanelProps}
-        editor={{ languageId: "javascript", locale, value: JS_CODE_WITH_ISSUES }}
-      />
-      <EditorPanel
-        {...baseEditorPanelProps}
-        editor={{ languageId: "javascript", locale, value: JS_CODE_WITH_ISSUES }}
-      />
-      <EditorPanel
-        {...baseEditorPanelProps}
-        editor={{ languageId: "typescript", locale, value: JS_CODE_WITH_ISSUES }}
-      />
-      <EditorPanel
-        {...baseEditorPanelProps}
-        editor={{ languageId: "typescript", locale, value: JS_CODE_WITH_ISSUES }}
-      />
+      <EditorPane languageId='javascript' locale={locale} setLocale={setLocale} />
+      <EditorPane languageId='javascript' locale={locale} setLocale={setLocale} />
+      <EditorPane languageId='typescript' locale={locale} setLocale={setLocale} />
+      <EditorPane languageId='typescript' locale={locale} setLocale={setLocale} />
     </Grid>
   );
 }
+
+const JS_CODE_WITH_ISSUES = `const str: number = "";
+
+const function = 5;
+
+const a: str = 1;
+
+c =;
+
+return;
+
+fnc() {
+  // this produces a parser error message below,
+  // not from the Typescript worker,
+  // which doesn't get translated
+`;
 
 /**
  * @remark These are Typescript locales and Monaco might not support all of them and will fallback to English,

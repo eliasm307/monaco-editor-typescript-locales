@@ -22,6 +22,7 @@
     "sourceMap": true,
     "incremental": true,
     "strictFunctionTypes": true,
+    "jsx": "preserve",
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
     "allowSyntheticDefaultImports": true,

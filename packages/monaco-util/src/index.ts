@@ -8,7 +8,6 @@ type LanguageId = (typeof TYPESCRIPT_WORKER_LANGUAGE_IDS)[number];
 
 type MessageTemplatesMap = Record<number, string>;
 
-// eslint-disable-next-line @typescript-eslint/consistent-type-imports
 type MonacoModule = typeof import("monaco-editor");
 
 /**
