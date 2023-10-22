@@ -162,23 +162,23 @@ async function translateMarkers({
 
   // NOTE: assumes the JS/TS messages will always have the owner for their markers set as the language ID
   // NOTE: we assume the current markers are in english and previous custom markers have been removed when this is called
-  // const originalMarkers = monaco.editor.getModelMarkers();
-  // if (!originalMarkers.length) {
+  // const defaultMarkers = monaco.editor.getModelMarkers();
+  // if (!defaultMarkers.length) {
   //   return; // no markers to translate or we already translated them
   // }
   // console.log("translateDiagnosticMessageMarkers", {
   //   languageId,
-  //   originalMarkers,
+  //   defaultMarkers,
   // });
 
   try {
     // translatableModels.map(async (model) => {
-    //   const originalMarkers = monaco.editor.getModelMarkers({
+    //   const defaultMarkers = monaco.editor.getModelMarkers({
     //     resource: model.uri,
     //     owner: languageId,
     //   });
     //   const translatedMarkers = await translateTypescriptWorkerMarkers({
-    //     originalMarkers,
+    //     defaultMarkers,
     //     targetLocale,
     //   });
 
@@ -186,12 +186,13 @@ async function translateMarkers({
     //   monaco.editor.setModelMarkers(model, `${languageId}-${targetLocale}`, translatedMarkers); // replace with translated markers
     // });
 
-    const originalMarkers = monaco.editor.getModelMarkers({ owner: languageId });
-    if (!originalMarkers.length) {
+    // NOTE: default markers are in English
+    const defaultMarkers = monaco.editor.getModelMarkers({ owner: languageId });
+    if (!defaultMarkers.length) {
       return; // no markers to translate or we already translated them
     }
     const translatedMarkers = await translateTypescriptWorkerMarkers({
-      originalMarkers,
+      defaultMarkers,
       targetLocale,
     });
 
@@ -226,10 +227,13 @@ async function translateMarkers({
 }
 
 async function translateTypescriptWorkerMarkers({
-  originalMarkers,
+  defaultMarkers,
   targetLocale,
 }: {
-  originalMarkers: editor.IMarker[];
+  /**
+   * @remark assumes the default markers are in english
+   */
+  defaultMarkers: editor.IMarker[];
   targetLocale: string;
 }) {
   const [englishDiagnosticMessageTemplatesMap, targetLocaleDiagnosticMessageTemplatesMap] =
@@ -239,35 +243,35 @@ async function translateTypescriptWorkerMarkers({
     ]);
 
   return (
-    originalMarkers
+    defaultMarkers
       // .filter((marker) => TYPESCRIPT_WORKER_LANGUAGE_IDS.includes(marker.owner as LanguageId))
-      .map((tsWorkerMarker) => {
+      .map((defaultMarker) => {
         // if (!TYPESCRIPT_WORKER_LANGUAGE_IDS.includes(marker.owner as LanguageId)) {
         //   return marker; // not a JS/TS marker so we cant translate but we need to keep it
         // }
-        if (!tsWorkerMarker.code) {
-          return tsWorkerMarker; // marker doesn't have a code so we cant translate, keep the original
+        if (!defaultMarker.code) {
+          return defaultMarker; // marker doesn't have a code so we cant translate, keep the original
         }
 
         const messageCode = Number(
-          typeof tsWorkerMarker.code === "object" ? tsWorkerMarker.code.value : tsWorkerMarker.code,
+          typeof defaultMarker.code === "object" ? defaultMarker.code.value : defaultMarker.code,
         );
         if (isNaN(messageCode)) {
-          return tsWorkerMarker; // found code is not valid so we cant translate, keep the original
+          return defaultMarker; // found code is not valid so we cant translate, keep the original
         }
 
         const translatedMessage = translatedDiagnosticMessage({
-          englishMessage: tsWorkerMarker.message,
+          englishMessage: defaultMarker.message,
           englishMessageTemplate: englishDiagnosticMessageTemplatesMap[messageCode],
           localeMessageTemplate: targetLocaleDiagnosticMessageTemplatesMap[messageCode],
         });
 
         if (!translatedMessage) {
-          return tsWorkerMarker; // could not translate the message, so keep the original
+          return defaultMarker; // could not translate the message, so keep the original
         }
 
         return {
-          ...tsWorkerMarker,
+          ...defaultMarker,
           message: translatedMessage, // replace the message with the translated version
         };
       })
@@ -312,7 +316,7 @@ function translatedDiagnosticMessage({
   // populate the locale message template with the placeholder values from the english message
   return Object.entries(placeholderMatches.groups).reduce<string>(
     (outMessage, [placeholderIdentifier, placeholderValue]) => {
-      const placeholderIndex = getNumberFromText(placeholderIdentifier);
+      const placeholderIndex = placeholderIdentifier.replace("_", "");
       return outMessage.replace(`{${placeholderIndex}}`, placeholderValue);
     },
     localeMessageTemplate,
@@ -331,29 +335,16 @@ function createEnglishMessagePlaceholdersRegex({
 }): RegExp {
   let placeholdersRegexText = messageTemplateToRegexTextCache.get(englishMessageTemplate);
   if (!placeholdersRegexText) {
+    // NOTE: named capture group id needs to be a valid JS identifier (so cant be directly the index)
     placeholdersRegexText = escapeRegExp(englishMessageTemplate).replace(
-      /\\{\d+\\}/g,
-      (placeholder) => {
-        const placeholderIndex = getNumberFromText(placeholder);
-        // NOTE: this needs to be a valid JS identifier (so cant be directly the index) for named regex capture groups
-        // ie something that could be used as a js variable name
-        const placeholderIdentifier = `_${placeholderIndex}`;
-        return `(?<${placeholderIdentifier}>.+)`;
-      },
+      /\\{(\d+)\\}/g,
+      "(?<_$1>.+)",
     );
     messageTemplateToRegexTextCache.set(englishMessageTemplate, placeholdersRegexText);
   }
 
-  // this is stateful as it uses the `g` flag so dont cache the regex itself but we cache the content
+  // this is stateful as it uses the `g` flag so we don't cache the regex itself but we cache the content
   return new RegExp(placeholdersRegexText, "g");
-}
-
-function getNumberFromText(text: string): number {
-  const number = Number(text.replace(/\D/g, ""));
-  if (isNaN(number)) {
-    throw Error(`Could not get placeholder index from "${text}"`);
-  }
-  return number;
 }
 
 const LOCALE_TO_MESSAGE_TEMPLATES_MAP_CACHE: { [key in string]?: MessageTemplatesMap } = {};

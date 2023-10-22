@@ -1,48 +1,150 @@
 "use client";
 
-import { Box, Grid, HStack, Heading, Select, Text, VStack } from "@chakra-ui/react";
-import { Editor } from "@monaco-editor/react";
+import {
+  Box,
+  Center,
+  Grid,
+  HStack,
+  Heading,
+  Select,
+  Spinner,
+  Text,
+  Tooltip,
+  VStack,
+} from "@chakra-ui/react";
+import { Editor, loader } from "@monaco-editor/react";
 import { register } from "monaco-editor-typescript-locales/src/index";
 import localesMetadata from "monaco-editor-typescript-locales/locales/metadata.json";
-import { useEffect, useRef } from "react";
-import { editor } from "monaco-editor";
+import { useEffect, useRef, useState } from "react";
+import { Colours } from "./constants";
 
 const BREAK_POINT = "md";
 
+function getLocaleFromUrl() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const locale = urlParams.get("locale");
+  return locale || "en";
+}
+
+function setLocaleInUrl(locale: string) {
+  if (typeof window === "undefined") return;
+  const urlParams = new URLSearchParams(window.location.search);
+  urlParams.set("locale", locale);
+  window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}`);
+
+  // NOTE: need to reload so `loader` can be reinitialized with the new locale
+  window.location.reload();
+}
+
 export default function Home() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
+  const locale = getLocaleFromUrl();
+
   return (
-    <Grid as='main' templateColumns='1fr' templateRows='auto 1fr' height='100dvh' p={3}>
-      <HStack
-        as='nav'
-        p={3}
-        flexDirection={{
-          base: "column",
-          [BREAK_POINT]: "row",
-        }}
-      >
-        <Heading as='h1' fontSize='x-large' flex={1}>
-          Monaco Editor Typescript Locales Util Demo
-        </Heading>
-        <Text>
-          Locales from Typescript Version: {localesMetadata.generatedFromTypescriptVersion}
-        </Text>
-      </HStack>
-      <Grid
-        height={{ base: "auto", [BREAK_POINT]: "100%" }}
-        templateColumns={{ base: "1fr", [BREAK_POINT]: "1fr 1fr" }}
-        templateRows={{ base: "1fr", [BREAK_POINT]: "1fr 1fr" }}
-        width='100%'
-      >
-        <EditorPane languageId='javascript' defaultLocale='en' />
-        <EditorPane languageId='typescript' defaultLocale='en' />
-        <EditorPane languageId='javascript' defaultLocale='fr' />
-        <EditorPane languageId='typescript' defaultLocale='es' />
-      </Grid>
+    <Grid
+      as='main'
+      height='100dvh'
+      width='100dvw'
+      templateColumns='1fr'
+      templateRows='auto 1fr'
+      p={0}
+    >
+      <Header locale={locale} setLocale={setLocaleInUrl} />
+      <Editors locale={locale} setLocale={setLocaleInUrl} />
     </Grid>
   );
 }
 
-const JS_CODE_WITH_ISSUES = `
+function Header({ locale, setLocale }: { locale: string; setLocale: (locale: string) => void }) {
+  // todo add theme switcher
+  return (
+    <VStack
+      className='header-container'
+      width='100%'
+      position='relative'
+      zIndex={1}
+      background={Colours.monacoPrimary}
+      color='white'
+      p={3}
+    >
+      <Heading as='h1' fontSize='x-large' flex={1}>
+        Monaco Editor Typescript Locales Demo
+      </Heading>
+      <HStack>
+        <Tooltip
+          label={`Diagnostic messages translated using Typescript Version: ${localesMetadata.generatedFromTypescriptVersion}`}
+        >
+          <Text whiteSpace='nowrap'>Current Locale:</Text>
+        </Tooltip>
+        <LocaleSelect defaultLocale={locale} onChange={setLocale} />
+      </HStack>
+    </VStack>
+  );
+}
+
+function Editors({ locale, setLocale }: { locale: string; setLocale: (locale: string) => void }) {
+  const [state, setState] = useState<"idle" | "loading">("idle");
+
+  useEffect(() => {
+    loader.config({
+      "vs/nls": { availableLanguages: { "*": locale === "en" ? undefined : locale } },
+    });
+
+    const existingInstance = loader.__getMonacoInstance();
+    if (existingInstance) {
+      existingInstance.editor.getEditors().forEach((editor) => {
+        editor.dispose();
+      });
+    }
+
+    setState("loading");
+    console.log("Monaco editor init with locale", locale);
+    loader.init().then(() => {
+      console.log("Monaco editor init done");
+      setState("idle");
+    });
+  }, [locale]);
+
+  if (state === "loading")
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+
+  return (
+    <Grid
+      className='editors-container'
+      position='relative'
+      zIndex={2}
+      height={{ base: "auto", [BREAK_POINT]: "100%" }}
+      templateColumns={{ base: "1fr", [BREAK_POINT]: "1fr 1fr" }}
+      templateRows={{ base: "1fr", [BREAK_POINT]: "1fr 1fr" }}
+      transition='none !important'
+      width='100%'
+      maxWidth='100%'
+      overflow='visible' // so editor tooltips aren't clipped
+      gap={3}
+      p={3}
+    >
+      <EditorPane languageId='javascript' locale={locale} setLocale={setLocale} />
+      <EditorPane languageId='javascript' locale={locale} setLocale={setLocale} />
+      <EditorPane languageId='typescript' locale={locale} setLocale={setLocale} />
+      <EditorPane languageId='typescript' locale={locale} setLocale={setLocale} />
+    </Grid>
+  );
+}
+
+const JS_CODE_WITH_ISSUES = `const str: number = "";
+
+const function = 5;
+
 const a: str = 1;
 
 c =;
@@ -50,94 +152,116 @@ c =;
 return;
 
 fnc() {
-  // this produces a parser error below
+  // this produces a parser error message below,
+  // not from the Typescript worker,
   // which doesn't get translated
 `;
 
 type EditorPaneProps = {
   languageId: "javascript" | "typescript";
-  defaultLocale?: string;
+  locale?: string;
+  setLocale?: (locale: string) => void;
 };
 
-function EditorPane({ languageId, defaultLocale }: EditorPaneProps) {
-  const monacoRef = useRef<typeof import("monaco-editor")>();
-  const resizeObserverRef = useRef<ResizeObserver>();
+function EditorPane({ languageId, locale }: EditorPaneProps) {
+  // const monacoRef = useRef<typeof import("monaco-editor")>();
+  const [monaco, setMonaco] = useState<typeof import("monaco-editor")>();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    return () => {
-      resizeObserverRef.current?.disconnect();
-    };
-  }, []);
+    if (!monaco) return;
+    const languageDefaults = getLanguageIdDefaults({
+      monaco: monaco,
+      languageId,
+    });
+
+    // update compiler options `locale` and keep other existing options
+    languageDefaults.setCompilerOptions({
+      ...languageDefaults.getCompilerOptions(),
+      locale,
+    });
+  }, [locale, languageId, monaco]);
 
   return (
     <VStack
+      className='editor-pane'
+      ref={containerRef}
       as='section'
       height={{
+        base: "auto",
         [BREAK_POINT]: "100%",
       }}
       minHeight='40dvh'
-      width={{
-        base: "99%",
-        [BREAK_POINT]: "99%",
-      }}
-      transition='none'
+      width='99%' // monaco editor doesn't like 100% width, ie its not responsive when decreasing width but works when increasing width 🤷🏾‍♂️
+      transition='none !important'
+      overflow='visible' // so editor tooltips aren't clipped
     >
-      <HStack width='100%' px={3}>
-        <Heading as='h2' flex='none' size='md'>
-          {languageId} Locale:{" "}
-        </Heading>
-        <Select
-          placeholder='Select option'
-          defaultValue={defaultLocale}
-          onChange={(event) => {
-            if (!monacoRef.current) return;
-            const languageDefaults = getLanguageIdDefaults({
-              monaco: monacoRef.current,
-              languageId,
-            });
-
-            languageDefaults.setCompilerOptions({
-              ...languageDefaults.getCompilerOptions(),
-              locale: event.target.value,
-            });
-            // setLanguageLocale({
-            //   monaco: monacoRef.current,
-            //   model: languageId,
-            //   locale: event.target.value,
-            // });
+      <Heading as='h2' width='100%' flex='none' size='sm' textAlign='center'>
+        {getLanguageDisplayName(languageId)} Editor
+      </Heading>
+      <Box
+        className='monaco-editor-container'
+        outline='1px solid rgba(0,0,0,0.2)'
+        width='100%'
+        height='100%'
+      >
+        <Editor
+          key={`${languageId}-${locale}`} // force remount when locale changes
+          defaultLanguage={languageId}
+          defaultValue={JS_CODE_WITH_ISSUES}
+          options={{
+            automaticLayout: true,
+            minimap: { enabled: false },
           }}
-        >
-          {localesMetadata.availableLocales.map((locale) => (
-            <option key={locale} value={locale}>
-              {locale}
-            </option>
-          ))}
-        </Select>
-      </HStack>
-      <Editor
-        defaultLanguage={languageId}
-        defaultValue={JS_CODE_WITH_ISSUES}
-        options={{
-          scrollBeyondLastLine: false,
-          // automaticLayout: true,
-          minimap: {
-            enabled: false,
-          },
-        }}
-        beforeMount={(monaco) => {
-          monacoRef.current = monaco;
-          if (defaultLocale) {
-            register(monacoRef.current);
-            // setLanguageLocale({ monaco, model: languageId, locale: defaultLocale });
-          }
-        }}
-        onMount={(editor) => {
-          resizeObserverRef.current = new ResizeObserver(([entry]) => {
-            editor.layout(entry.contentRect);
-          });
-        }}
-      />
+          beforeMount={(monaco) => {
+            register(monaco);
+            setMonaco(monaco);
+          }}
+        />
+      </Box>
     </VStack>
+  );
+}
+
+function getLanguageDisplayName(languageId: string) {
+  switch (languageId) {
+    case "typescript":
+      return "TypeScript";
+    case "javascript":
+      return "JavaScript";
+    default:
+      throw Error(`Unsupported language ID "${languageId}"`);
+  }
+}
+
+/**
+ * @remark These are Typescript locales and Monaco might not support all of them and will fallback to English,
+ * but the Typescript/Javascript diagnostic messages will be in the selected locale
+ */
+function LocaleSelect({
+  defaultLocale,
+  onChange,
+}: {
+  defaultLocale?: string;
+  onChange: (newLocale: string) => void;
+}) {
+  const intlDisplayName = useRef(
+    new Intl.DisplayNames([window.navigator.language || "en"], { type: "language" }),
+  ).current;
+
+  return (
+    <Select
+      defaultValue={defaultLocale}
+      required
+      isRequired
+      onChange={(event) => onChange(event.target.value)}
+    >
+      {localesMetadata.availableLocales.map((locale) => (
+        <option key={locale} value={locale} style={{ color: "black" }}>
+          {locale} - {intlDisplayName.of(locale)}
+        </option>
+      ))}
+    </Select>
   );
 }
 
