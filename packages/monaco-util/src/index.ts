@@ -33,16 +33,9 @@ export function register(monaco: MonacoModule): void {
     return; // already initialised
   }
 
-  const languageIdAndDefaultsList: {
-    languageId: LanguageId;
-    defaults: languages.typescript.LanguageServiceDefaults;
-  }[] = [
-    { languageId: "typescript", defaults: monaco.languages.typescript.typescriptDefaults },
-    { languageId: "javascript", defaults: monaco.languages.typescript.javascriptDefaults },
-  ];
-
   // setup JS/TS message translation on locale change
-  languageIdAndDefaultsList.forEach(({ languageId, defaults }) => {
+  TYPESCRIPT_WORKER_LANGUAGE_IDS.forEach((languageId) => {
+    const defaults = getDefaultsForLanguageId({ monaco, languageId });
     defaults.onDidChange(() => {
       // NOTE: we derive this from compiler options so we use the same locale as the compiler,
       // if we tracked this separately we could end up using a different locale if Monaco adds support for this property in the future
@@ -60,8 +53,25 @@ export function register(monaco: MonacoModule): void {
   });
 }
 
-// default is english
-const currentLanguageLocales: Record<LanguageId, string> = {
+function getDefaultsForLanguageId({
+  monaco,
+  languageId,
+}: {
+  monaco: MonacoModule;
+  languageId: LanguageId;
+}): languages.typescript.LanguageServiceDefaults {
+  switch (languageId) {
+    case "typescript":
+      return monaco.languages.typescript.typescriptDefaults;
+    case "javascript":
+      return monaco.languages.typescript.javascriptDefaults;
+    default:
+      throw new Error(`Unsupported language ID: ${languageId}`);
+  }
+}
+
+// we keep track of the last set locale for each language so we can remove the previous custom markers when the locale changes
+const lastSetLanguageLocales: Record<LanguageId, string> = {
   typescript: "en",
   javascript: "en",
 };
@@ -75,14 +85,14 @@ function onLanguageLocaleChange({
   languageId: "javascript" | "typescript";
   newLocale: string;
 }) {
-  const oldLocale = currentLanguageLocales[languageId];
+  const oldLocale = lastSetLanguageLocales[languageId];
   if (oldLocale === newLocale) {
     return; // no change
   }
 
   // Remove all custom markers from previous locale and update current locale markers
   monaco.editor.removeAllMarkers(`${languageId}-${oldLocale}`);
-  currentLanguageLocales[languageId] = newLocale;
+  lastSetLanguageLocales[languageId] = newLocale;
 
   // todo test it refreshes affected model markers on locale change
 
@@ -98,11 +108,10 @@ async function translateMarkersForLanguage({
   monaco: MonacoModule;
   languageId: LanguageId;
 }): Promise<void> {
-  const targetLocale = currentLanguageLocales[languageId];
+  const targetLocale = lastSetLanguageLocales[languageId];
   if (targetLocale === "en") {
     return; // no translation needed, assume default markers are in english
   }
-  console.log("translateMarkersForLanguage", { languageId, targetLocale });
 
   // todo test when there are multiple editors and markers are not doubled up
   try {
@@ -219,7 +228,6 @@ function translatedDiagnosticMessage({
       localeMessageTemplate,
       placeholdersRegex,
     });
-    debugger;
     return; // this should not happen but we keep the english message if it does
   }
 
