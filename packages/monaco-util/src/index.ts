@@ -1,6 +1,5 @@
 /* eslint-disable functional-core/purity */
 import type { editor, languages, Uri } from "monaco-editor";
-import { escapeRegExp } from "./utils";
 
 const TYPESCRIPT_WORKER_LANGUAGE_IDS = ["typescript", "javascript"] as const;
 
@@ -274,8 +273,36 @@ function createEnglishMessagePlaceholdersRegex({
   return placeholdersRegex;
 }
 
-const LOCALE_TO_MESSAGE_TEMPLATES_MAP_CACHE: { [key in string]?: MessageTemplatesMap } = {};
+/**
+ * Used to match `RegExp`
+ * [syntax characters](http://ecma-international.org/ecma-262/7.0/#sec-patterns).
+ */
+const reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
+const reHasRegExpChar = RegExp(reRegExpChar.source);
 
+/**
+ * Escapes the `RegExp` special characters "^", "$", "\", ".", "*", "+",
+ * "?", "(", ")", "[", "]", "{", "}", and "|" in `string`.
+ *
+ * @remark From lodash
+ *
+ * @since Lodash 3.0.0
+ * @category String
+ * @param {string} [string=''] The string to escape.
+ * @returns {string} Returns the escaped string.
+ * @see escape, escapeRegExp, unescape
+ * @example
+ *
+ * escapeRegExp('[lodash](https://lodash.com/)')
+ * // => '\[lodash\]\(https://lodash\.com/\)'
+ */
+function escapeRegExp(string: string): string {
+  return string && reHasRegExpChar.test(string)
+    ? string.replace(reRegExpChar, "\\$&")
+    : string || "";
+}
+
+const LOCALE_TO_MESSAGE_TEMPLATES_MAP_CACHE: { [key in string]?: MessageTemplatesMap } = {};
 async function getDiagnosticMessageTemplatesForLocale(
   locale: string,
 ): Promise<MessageTemplatesMap> {

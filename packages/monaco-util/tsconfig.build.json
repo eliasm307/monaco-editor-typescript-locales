@@ -8,6 +8,6 @@
     "importHelpers": true,
     "removeComments": false
   },
-  "include": ["src"],
+  "include": ["src/index.ts"],
   "exclude": ["node_modules", "dist"]
 }

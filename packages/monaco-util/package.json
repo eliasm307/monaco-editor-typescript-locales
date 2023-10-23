@@ -21,6 +21,10 @@
   ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist/index.js",
+    "locales"
+  ],
   "scripts": {
     "build:code": "echo 'Building code...' && tsc -p ./tsconfig.build.json",
     "build:locales": "echo 'Building locales...' && node ./src/scripts/get-locale-diagnostic-messages.js",
@@ -42,10 +46,6 @@
     "glob": "^10.3.10",
     "monaco-editor": "^0.44.0"
   },
-  "files": [
-    "dist",
-    "locales"
-  ],
   "dependencies": {
     "tslib": "^2.6.2"
   }

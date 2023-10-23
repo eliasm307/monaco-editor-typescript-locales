@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
 /* eslint-env node */
+/* eslint-disable no-console */
 
 const path = require("node:path");
 const fs = require("node:fs");
@@ -21,39 +21,47 @@ const DIAGNOSTIC_MESSAGES_FILE_NAME_WITH_EXT = "diagnosticMessages.generated.jso
 const LOCALES_METADATA_FILE_PATH = path.join(LOCALES_DIR, "metadata.json");
 
 async function main() {
+  // English messages are distributed in the typescript source code, not as a standalone json file
+  // so we need to generate our own
   await generateEnglishDiagnosticMessages();
+  let availableLocales = ["en"];
 
-  copyLocaleDiagnosticMessagesFromNodeModulesAndCreateMetadata();
+  // Non english locale messages are included in the typescript distribution in node_modules, so copy them to our folder
+  const localeDiagnosticMessagesFilePaths = getLocaleDiagnosticMessagesFilePaths();
+  for (const diagnosticMessagesFilePath of localeDiagnosticMessagesFilePaths) {
+    const locale = path.basename(path.dirname(diagnosticMessagesFilePath));
+    copyDiagnosticMessagesFromPath({ locale, diagnosticMessagesFilePath });
+    availableLocales.push(locale);
+  }
+
+  createMetadataFile(availableLocales);
 }
 
 main().then(() => console.log("DONE"));
 
+function getLocaleDiagnosticMessagesFilePaths() {
+  return glob.sync(`*/${DIAGNOSTIC_MESSAGES_FILE_NAME_WITH_EXT}`, {
+    cwd: TYPESCRIPT_NODE_MODULES_LIB_DIR,
+    absolute: true,
+  });
+}
+
 /**
- * Non english locale messages are included in the typescript distribution in node_modules, so copy them to our folder
+ * @param {{locale: string, diagnosticMessagesFilePath: string}} param0
  */
-function copyLocaleDiagnosticMessagesFromNodeModulesAndCreateMetadata() {
-  const localeDiagnosticMessagesFilePaths = glob.sync(
-    `*/${DIAGNOSTIC_MESSAGES_FILE_NAME_WITH_EXT}`,
-    {
-      cwd: TYPESCRIPT_NODE_MODULES_LIB_DIR,
-      absolute: true,
-    },
+function copyDiagnosticMessagesFromPath({ locale, diagnosticMessagesFilePath }) {
+  const destinationPath = path.join(LOCALES_DIR, locale, DIAGNOSTIC_MESSAGES_FILE_NAME_WITH_EXT);
+  fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
+  fs.copyFileSync(diagnosticMessagesFilePath, destinationPath); // NOTE: this replaces the file if it already exists
+  console.log(
+    `Copied "${locale}" diagnostic messages \n\tfrom "${diagnosticMessagesFilePath}" \n\tto ${destinationPath}`,
   );
+}
 
-  let availableLocales = ["en"];
-
-  // copy each locale messages file to our locales folder
-  for (const localeDiagnosticMessagesFilePath of localeDiagnosticMessagesFilePaths) {
-    const locale = path.basename(path.dirname(localeDiagnosticMessagesFilePath));
-    const destinationPath = path.join(LOCALES_DIR, locale, DIAGNOSTIC_MESSAGES_FILE_NAME_WITH_EXT);
-    fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
-    fs.copyFileSync(localeDiagnosticMessagesFilePath, destinationPath); // NOTE: this replaces the file if it already exists
-    console.log(
-      `Copied "${locale}" diagnostic messages \n\tfrom "${localeDiagnosticMessagesFilePath}" \n\tto ${destinationPath}`,
-    );
-    availableLocales.push(locale);
-  }
-
+/**
+ * @param {string[]} availableLocales - list of locales that have diagnostic messages
+ */
+function createMetadataFile(availableLocales) {
   ensureFileExistsAndWrite({
     filePath: LOCALES_METADATA_FILE_PATH,
     // NOTE: the version is accurate for non-english locales from our node_modules,
