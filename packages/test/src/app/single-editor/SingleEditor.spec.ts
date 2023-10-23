@@ -19,10 +19,11 @@ test.describe("Single Editor", () => {
       editor0Language: "typescript",
     });
 
-    await storybookPage.editorProxyInput.fill(
+    await storybookPage.editorValueProxyInput.fill(
       ["const str = 1;", "const bool: str = 5;"].join("\n"),
     );
 
+    // initial markers in english
     await storybookPage.assert.actualMarkersMatch([
       {
         owner: "typescript",
@@ -33,6 +34,7 @@ test.describe("Single Editor", () => {
       },
     ]);
 
+    // change locale from default
     await storybookPage.editorLocaleSelect.selectOption("fr");
     await storybookPage.assert.actualMarkersMatch([
       {
@@ -44,6 +46,7 @@ test.describe("Single Editor", () => {
       },
     ]);
 
+    // change locale from custom locale to another custom locale
     await storybookPage.editorLocaleSelect.selectOption("de");
     await storybookPage.assert.actualMarkersMatch([
       {
@@ -55,6 +58,7 @@ test.describe("Single Editor", () => {
       },
     ]);
 
+    // can go back to original locale from custom locale
     await storybookPage.editorLocaleSelect.selectOption("en");
     await storybookPage.assert.actualMarkersMatch([
       {
@@ -74,7 +78,7 @@ test.describe("Single Editor", () => {
       editor0Language: "typescript",
     });
 
-    await storybookPage.editorProxyInput.fill(
+    await storybookPage.editorValueProxyInput.fill(
       ["const str = 1;", "const bool: str = 5;"].join("\n"),
     );
 
@@ -90,10 +94,20 @@ test.describe("Single Editor", () => {
   });
 
   // todo write tests
-  test("it updates marker translations when value changes");
+  test("it updates marker translations when value changes", async ({ page }) => {
+    throw new Error("Not implemented");
+  });
 
   // also tests markers are not doubled up when there are multiple models
-  test("it can translate multiple models of the same js language simultaneously");
+  test("it can translate multiple models of the same js language simultaneously", async ({
+    page,
+  }) => {
+    throw new Error("Not implemented");
+  });
 
-  test("test it can translate multiple models of different js languages simultaneously");
+  test("test it can translate multiple models of different js languages simultaneously", async ({
+    page,
+  }) => {
+    throw new Error("Not implemented");
+  });
 });

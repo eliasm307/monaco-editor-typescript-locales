@@ -126,4 +126,9 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# generated TS locale files
 *.generated.json
+
+# playwright
+**/playwright-report/
+**/trace.zip

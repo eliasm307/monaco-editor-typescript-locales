@@ -16,16 +16,18 @@ type MonacoModule = typeof import("monaco-editor");
 const initialisedMonacoInstances = new WeakSet<MonacoModule>();
 
 /**
- * Sets up the given Monaco instance to translate any JS/TS diagnostic marker messages to the locale configured for the language in the compiler options.
+ * Sets up the given Monaco instance to translate any JS/TS diagnostic marker messages
+ * to the locale configured for the language in the compiler options.
  *
- * For example the following will show messages in French for TypeScript models but English for JavaScript models (if the local has not been configured for JS):
+ * For example the following will show messages in French for TypeScript models
+ * but English for JavaScript models (if the local has not been configured for JS):
  * ```ts
  * const typescriptDefaults = monaco.languages.typescript.typescriptDefaults;
  * const currentCompilerOptions = typescriptDefaults.getCompilerOptions();
  * typescriptDefaults.setCompilerOptions({ ...currentCompilerOptions, locale: "fr" });
  * ```
  *
- * @remark This is idempotent and will only initialise a given Monaco instance once when called multiple times.
+ * @remark This is idempotent and will only initialise a given Monaco instance once if called multiple times.
  */
 export function register(monaco: MonacoModule): void {
   if (initialisedMonacoInstances.has(monaco)) {
@@ -119,9 +121,10 @@ async function translateMarkersForLanguage({
     }
     const translatedMarkers = await translateMarkers({ defaultJsOrTsMarkers, targetLocale });
 
-    // this is so the user only sees TS/JS messages in their language and not the original english message also
+    // remove english markers after getting them but before setting the new translated markers to not trigger marker change handler recursively
+    // NOTE: this is so the user only sees TS/JS messages in their language and not the original english message also
     // NOTE: if a message cant be translated it will be maintained in english
-    monaco.editor.removeAllMarkers(languageId); // remove english markers after translation but before setting the new translated markers
+    monaco.editor.removeAllMarkers(languageId);
 
     translatedMarkers
       // group markers by resource
@@ -137,8 +140,8 @@ async function translateMarkersForLanguage({
         // not sure if non model resources can have markers but checking just in case
         if (model) {
           // NOTE: need to set a different owner ID as setting the markers here will trigger the marker change listener which recursively triggers this method again,
-          // but with a non ts/js owner the markers wont be processed again as we filter for js/ts markers specifically,
-          // so there will be no markers found and the markers aren't set again
+          //    but with a non ts/js owner the markers wont be processed again as we filter for js/ts markers specifically,
+          //    so there will be no markers found and the markers aren't set again
           monaco.editor.setModelMarkers(model, `${languageId}-${targetLocale}`, markers);
         }
       });
@@ -171,10 +174,6 @@ async function translateMarkers({
     const messageCode = Number(
       typeof defaultMarker.code === "object" ? defaultMarker.code.value : defaultMarker.code,
     );
-    if (isNaN(messageCode)) {
-      return defaultMarker; // found code is not valid so we cant translate, keep the original
-    }
-
     const translatedMessage = translatedDiagnosticMessage({
       englishMessage: defaultMarker.message,
       englishMessageTemplate: englishDiagnosticMessageTemplatesMap[messageCode],
@@ -198,8 +197,8 @@ function translatedDiagnosticMessage({
   localeMessageTemplate,
 }: {
   englishMessage: string;
-  localeMessageTemplate?: string;
-  englishMessageTemplate?: string;
+  localeMessageTemplate: string | undefined;
+  englishMessageTemplate: string | undefined;
 }): string | undefined {
   if (!englishMessageTemplate || !localeMessageTemplate) {
     // this could happen if this package is used with a version of Monaco that uses a higher version of TS than this package
@@ -218,7 +217,7 @@ function translatedDiagnosticMessage({
   });
   const placeholderMatches = placeholdersRegex.exec(englishMessage);
   if (!placeholderMatches?.groups) {
-    console.error("getTranslatedMessage no matches found", {
+    console.error("no placeholder matches using regex found", {
       englishMessage,
       englishMessageTemplate,
       localeMessageTemplate,
@@ -262,7 +261,7 @@ function createEnglishMessagePlaceholdersRegex({
       if (visitedPlaceholderIndexes.has(placeholderIndex)) {
         // placeholder has already been visited so we don't need to create a new capture group
         // duplicate capture group names will cause an error when creating the regex
-        // example for: "'{0}' refers to a value, but is being used as a type here. Did you mean 'typeof {0}'?"
+        // example template: "'{0}' refers to a value, but is being used as a type here. Did you mean 'typeof {0}'?"
         return ".+";
       }
       visitedPlaceholderIndexes.add(placeholderIndex);

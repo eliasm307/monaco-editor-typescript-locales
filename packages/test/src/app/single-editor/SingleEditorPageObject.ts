@@ -34,20 +34,31 @@ export default class SingleEditorPageObject {
     const url = createTestPageUrlWithConfig({ path: PAGE_PATH, config });
     console.log(`Opening page: ${url}`);
     await this.page.goto(url);
-    // we expect markers to exist for any test case
+
+    // wait until editor is ready ie we expect markers to exist for any test case
     await expect(this.editorMarkersDataContainer, {
       message: "markers data container should be visible initially",
     }).toBeVisible({ timeout: 10_000 });
   }
 
+  /**
+   * This is a select element that can be used to change the compilerOptions locale of the editor
+   */
   get editorLocaleSelect() {
     return this.page.locator("#editor-locale-select");
   }
 
-  get editorProxyInput() {
+  /**
+   * Setting the editor value via Playwright locators is difficult so this input is to simplify this
+   * where changes to this input are set as the value of the editor
+   */
+  get editorValueProxyInput() {
     return this.page.locator("#editor-proxy-value-input");
   }
 
+  /**
+   * This element will contain a JSON representation of the current markers in the editor
+   */
   get editorMarkersDataContainer() {
     return this.page.locator("#editor-markers-data-container");
   }
