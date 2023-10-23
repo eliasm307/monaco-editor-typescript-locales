@@ -2,7 +2,16 @@ import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import { createTestPageUrlWithConfig } from "../../utils";
 import { TestMarkerData, BaseTestPageConfig } from "../../types";
-import { LanguageId } from "@packages/common/src/types";
+import { LanguageId, MonacoModule } from "@packages/common/src/types";
+import { editor } from "monaco-editor";
+
+declare global {
+  interface Window {
+    editor: editor.ICodeEditor;
+    // this is added by monaco itself
+    monaco: MonacoModule;
+  }
+}
 
 class Assertions {
   constructor(private object: SingleEditorPageObject) {}
@@ -17,6 +26,16 @@ class Assertions {
   }
 }
 
+class Actions {
+  constructor(private object: SingleEditorPageObject) {}
+
+  async setEditorValue(value: string) {
+    await this.object.page.evaluate((value) => {
+      window.editor.setValue(value);
+    }, value);
+  }
+}
+
 const PAGE_PATH = "/single-editor";
 
 type SingleEditorPageConfig = BaseTestPageConfig & {
@@ -24,11 +43,10 @@ type SingleEditorPageConfig = BaseTestPageConfig & {
 };
 
 export default class SingleEditorPageObject {
-  assert: Assertions;
+  assert = new Assertions(this);
+  actions = new Actions(this);
 
-  constructor(public page: Page) {
-    this.assert = new Assertions(this);
-  }
+  constructor(public page: Page) {}
 
   async openPage(config: SingleEditorPageConfig) {
     const url = createTestPageUrlWithConfig({ path: PAGE_PATH, config });
@@ -39,6 +57,10 @@ export default class SingleEditorPageObject {
     await expect(this.editorMarkersDataContainer, {
       message: "markers data container should be visible initially",
     }).toBeVisible({ timeout: 10_000 });
+
+    await this.page.evaluate(() => {
+      window.editor = window.monaco.editor.getEditors()[0];
+    });
   }
 
   /**
@@ -46,14 +68,6 @@ export default class SingleEditorPageObject {
    */
   get editorLocaleSelect() {
     return this.page.locator("#editor-locale-select");
-  }
-
-  /**
-   * Setting the editor value via Playwright locators is difficult so this input is to simplify this
-   * where changes to this input are set as the value of the editor
-   */
-  get editorValueProxyInput() {
-    return this.page.locator("#editor-proxy-value-input");
   }
 
   /**

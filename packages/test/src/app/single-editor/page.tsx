@@ -87,15 +87,6 @@ export default function Page() {
           />
         </HStack>
         <Heading as='h2' size='md'>
-          Value Input
-        </Heading>
-        <Textarea
-          id='editor-proxy-value-input'
-          onChange={(e) => {
-            editor?.getModel()?.setValue(e.target.value);
-          }}
-        />
-        <Heading as='h2' size='md'>
           Markers
         </Heading>
         {currentMarkers.length && (

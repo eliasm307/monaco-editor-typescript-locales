@@ -19,7 +19,7 @@ test.describe("Single Editor", () => {
       editor0Language: "typescript",
     });
 
-    await storybookPage.editorValueProxyInput.fill(
+    await storybookPage.actions.setEditorValue(
       ["const str = 1;", "const bool: str = 5;"].join("\n"),
     );
 
@@ -78,7 +78,7 @@ test.describe("Single Editor", () => {
       editor0Language: "typescript",
     });
 
-    await storybookPage.editorValueProxyInput.fill(
+    await storybookPage.actions.setEditorValue(
       ["const str = 1;", "const bool: str = 5;"].join("\n"),
     );
 
