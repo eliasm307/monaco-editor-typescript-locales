@@ -3,19 +3,21 @@ import { useState, useRef, useEffect } from "react";
 import type { BoxProps } from "@chakra-ui/react";
 import { Box, Heading, VStack } from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
-import type { Monaco } from "../types";
+import type { editor } from "monaco-editor";
+import type { LanguageId, MonacoModule } from "../types";
 
 export type EditorPanelProps = BoxProps & {
   editor: {
-    languageId: "javascript" | "typescript";
+    languageId: LanguageId;
     locale?: string;
-    value: string;
-    onMonacoLoaded?: (monaco: Monaco) => void;
+    defaultValue: string;
+    onMonacoLoaded?: (monaco: MonacoModule) => void;
+    onEditorMounted?: (editor: editor.IStandaloneCodeEditor) => void;
   };
 };
 
 export default function EditorPanel({
-  editor: { languageId, locale, value, onMonacoLoaded },
+  editor: { languageId, locale, defaultValue, onMonacoLoaded, onEditorMounted },
   ...boxProps
 }: EditorPanelProps) {
   const [monaco, setMonaco] = useState<typeof import("monaco-editor")>();
@@ -59,7 +61,7 @@ export default function EditorPanel({
         <Editor
           key={`${languageId}-${locale}`} // force remount when locale changes
           defaultLanguage={languageId}
-          defaultValue={value}
+          defaultValue={defaultValue}
           options={{
             automaticLayout: true,
             minimap: { enabled: false },
@@ -68,6 +70,9 @@ export default function EditorPanel({
             register(monacoInstanceInstance);
             onMonacoLoaded?.(monacoInstanceInstance);
             setMonaco(monacoInstanceInstance);
+          }}
+          onMount={(editorInstance) => {
+            onEditorMounted?.(editorInstance);
           }}
         />
       </Box>
@@ -86,7 +91,13 @@ function getLanguageDisplayName(languageId: string) {
   }
 }
 
-function getLanguageIdDefaults({ monaco, languageId }: { monaco: Monaco; languageId: string }) {
+function getLanguageIdDefaults({
+  monaco,
+  languageId,
+}: {
+  monaco: MonacoModule;
+  languageId: string;
+}) {
   switch (languageId) {
     case "typescript":
       return monaco.languages.typescript.typescriptDefaults;

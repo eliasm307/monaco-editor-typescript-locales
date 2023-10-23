@@ -22,7 +22,13 @@ export function generateMetadata(): Metadata {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
-      <body className={inter.className}>
+      <body
+        className={inter.className}
+        style={{
+          height: "100dvh",
+          overflow: "hidden",
+        }}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

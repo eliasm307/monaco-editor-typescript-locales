@@ -1,22 +1,12 @@
 "use client";
 
-import {
-  Box,
-  Center,
-  Grid,
-  HStack,
-  Heading,
-  Select,
-  Spinner,
-  Text,
-  Tooltip,
-  VStack,
-} from "@chakra-ui/react";
+import { Center, Grid, HStack, Heading, Spinner, Text, Tooltip, VStack } from "@chakra-ui/react";
 import { loader } from "@monaco-editor/react";
 import localesMetadata from "monaco-editor-typescript-locales/locales/metadata.json";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Colours } from "./constants";
 import EditorPanel, { EditorPanelProps } from "@packages/common/src/components/EditorPanel";
+import LocaleSelect from "@packages/common/src/components/LocaleSelect";
 
 // todo update icons
 
@@ -36,6 +26,7 @@ function setLocaleInUrl(locale: string) {
 
   // todo make this configurable so it can be disabled if Monaco localisation is not needed
   // NOTE: need to reload so `loader` can be reinitialized with the new locale
+  // NOTE: this is not required to change locale for TS/JS diagnostic messages
   window.location.reload();
 }
 
@@ -66,6 +57,7 @@ export default function Home() {
 
 function Header({ locale, setLocale }: { locale: string; setLocale: (locale: string) => void }) {
   // todo add theme switcher
+  // todo add refresh on change checkbox, default should be unchecked so it doesnt seem like a refresh is required
   return (
     <VStack
       className='header-container'
@@ -161,51 +153,20 @@ function Editors({ locale, setLocale }: { locale: string; setLocale: (locale: st
     >
       <EditorPanel
         {...baseEditorPanelProps}
-        editor={{ languageId: "javascript", locale, value: JS_CODE_WITH_ISSUES }}
+        editor={{ languageId: "javascript", locale, defaultValue: JS_CODE_WITH_ISSUES }}
       />
       <EditorPanel
         {...baseEditorPanelProps}
-        editor={{ languageId: "javascript", locale, value: JS_CODE_WITH_ISSUES }}
+        editor={{ languageId: "javascript", locale, defaultValue: JS_CODE_WITH_ISSUES }}
       />
       <EditorPanel
         {...baseEditorPanelProps}
-        editor={{ languageId: "typescript", locale, value: JS_CODE_WITH_ISSUES }}
+        editor={{ languageId: "typescript", locale, defaultValue: JS_CODE_WITH_ISSUES }}
       />
       <EditorPanel
         {...baseEditorPanelProps}
-        editor={{ languageId: "typescript", locale, value: JS_CODE_WITH_ISSUES }}
+        editor={{ languageId: "typescript", locale, defaultValue: JS_CODE_WITH_ISSUES }}
       />
     </Grid>
-  );
-}
-
-/**
- * @remark These are Typescript locales and Monaco might not support all of them and will fallback to English,
- * but the Typescript/Javascript diagnostic messages will be in the selected locale
- */
-function LocaleSelect({
-  defaultLocale,
-  onChange,
-}: {
-  defaultLocale?: string;
-  onChange: (newLocale: string) => void;
-}) {
-  const intlDisplayName = useRef(
-    new Intl.DisplayNames([window.navigator.language || "en"], { type: "language" }),
-  ).current;
-
-  return (
-    <Select
-      defaultValue={defaultLocale}
-      required
-      isRequired
-      onChange={(event) => onChange(event.target.value)}
-    >
-      {localesMetadata.availableLocales.map((locale) => (
-        <option key={locale} value={locale} style={{ color: "black" }}>
-          {locale} - {intlDisplayName.of(locale)}
-        </option>
-      ))}
-    </Select>
   );
 }
