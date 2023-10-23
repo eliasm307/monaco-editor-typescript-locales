@@ -1,14 +1,24 @@
 "use client";
 
-import { Center, Grid, HStack, Heading, Spinner, Text, Tooltip, VStack } from "@chakra-ui/react";
+import {
+  Center,
+  Checkbox,
+  Grid,
+  HStack,
+  Heading,
+  Spinner,
+  Text,
+  Tooltip,
+  VStack,
+} from "@chakra-ui/react";
 import { loader } from "@monaco-editor/react";
 import localesMetadata from "monaco-editor-typescript-locales/locales/metadata.json";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Colours } from "./constants";
 import EditorPanel, { EditorPanelProps } from "@packages/common/src/components/EditorPanel";
 import LocaleSelect from "@packages/common/src/components/LocaleSelect";
 
-// todo update icons
+// todo update site icons
 
 const BREAK_POINT = "md";
 
@@ -18,27 +28,31 @@ function getLocaleFromUrl() {
   return locale || "en";
 }
 
-function setLocaleInUrl(locale: string) {
+type UrlParamKey = "locale" | "reloadOnChange";
+
+function setUrlParam(key: UrlParamKey, value: string | number | boolean) {
   if (typeof window === "undefined") return;
   const urlParams = new URLSearchParams(window.location.search);
-  urlParams.set("locale", locale);
+  urlParams.set(key, String(value));
   window.history.replaceState({}, "", `${window.location.pathname}?${urlParams}`);
+}
 
-  // todo make this configurable so it can be disabled if Monaco localisation is not needed
-  // NOTE: need to reload so `loader` can be reinitialized with the new locale
-  // NOTE: this is not required to change locale for TS/JS diagnostic messages
-  window.location.reload();
+function getUrlParam(key: UrlParamKey) {
+  if (typeof window === "undefined") return;
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get(key);
 }
 
 export default function Home() {
   const [mounted, setMounted] = useState(false);
+  const [locale, setLocale] = useState<string | null>(null);
+
   useEffect(() => {
     setMounted(true);
+    setLocale(getLocaleFromUrl());
   }, []);
 
-  if (!mounted) return null;
-
-  const locale = getLocaleFromUrl();
+  if (!mounted || !locale) return null;
 
   return (
     <Grid
@@ -49,15 +63,32 @@ export default function Home() {
       templateRows='auto 1fr'
       p={0}
     >
-      <Header locale={locale} setLocale={setLocaleInUrl} />
-      <Editors locale={locale} setLocale={setLocaleInUrl} />
+      <Header locale={locale} setLocale={setLocale} />
+      <Editors locale={locale} />
     </Grid>
   );
 }
 
 function Header({ locale, setLocale }: { locale: string; setLocale: (locale: string) => void }) {
-  // todo add theme switcher
-  // todo add refresh on change checkbox, default should be unchecked so it doesnt seem like a refresh is required
+  // todo add light/dark theme switcher
+
+  const reloadOnChangeRef = useRef(getUrlParam("reloadOnChange") === "true");
+
+  const onLocaleChange = useCallback((newLocale: string) => {
+    setLocale(newLocale);
+    setUrlParam("locale", newLocale);
+    if (reloadOnChangeRef.current) {
+      // NOTE: need to reload so `loader` can be reinitialized with the new locale
+      // NOTE: this is not required to change locale for TS/JS diagnostic messages
+      window.location.reload();
+    }
+  }, []);
+
+  const onReloadCheckBoxChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((e) => {
+    reloadOnChangeRef.current = e.target.checked;
+    setUrlParam("reloadOnChange", e.target.checked);
+  }, []);
+
   return (
     <VStack
       className='header-container'
@@ -77,7 +108,12 @@ function Header({ locale, setLocale }: { locale: string; setLocale: (locale: str
         >
           <Text whiteSpace='nowrap'>Current Locale:</Text>
         </Tooltip>
-        <LocaleSelect defaultLocale={locale} onChange={setLocale} />
+        <LocaleSelect defaultLocale={locale} onChange={onLocaleChange} />
+        <Tooltip label='The Typescript/JavaScript messages update when the locale is changed however other editor text requires a refresh to update the text to the new locale'>
+          <Checkbox flex='none' onChange={onReloadCheckBoxChange}>
+            Reload on Change
+          </Checkbox>
+        </Tooltip>
       </HStack>
     </VStack>
   );
@@ -99,7 +135,7 @@ fnc() {
   // which doesn't get translated
 `;
 
-function Editors({ locale, setLocale }: { locale: string; setLocale: (locale: string) => void }) {
+function Editors({ locale }: { locale: string }) {
   const [state, setState] = useState<"idle" | "loading">("idle");
 
   useEffect(() => {

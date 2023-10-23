@@ -93,8 +93,6 @@ function onLanguageLocaleChange({
   monaco.editor.removeAllMarkers(`${languageId}-${oldLocale}`);
   lastSetLanguageLocales[languageId] = newLocale;
 
-  // todo test it refreshes affected model markers on locale change
-
   // NOTE: this is triggered by a compiler options change which also seems to refresh the markers,
   // so we assume we will have the default english markers at this point
   void translateMarkersForLanguage({ monaco, languageId });
@@ -112,7 +110,6 @@ async function translateMarkersForLanguage({
     return; // no translation needed, assume default markers are in english
   }
 
-  // todo test when there are multiple editors and markers are not doubled up
   try {
     // NOTE: assumes the JS/TS messages will always have the owner for their markers set as the language ID
     // NOTE: we assume the current markers are in english and previous custom markers have been removed when this is called
@@ -266,7 +263,6 @@ function createEnglishMessagePlaceholdersRegex({
         // placeholder has already been visited so we don't need to create a new capture group
         // duplicate capture group names will cause an error when creating the regex
         // example for: "'{0}' refers to a value, but is being used as a type here. Did you mean 'typeof {0}'?"
-        // todo test this can translate messages with duplicated placeholders
         return ".+";
       }
       visitedPlaceholderIndexes.add(placeholderIndex);

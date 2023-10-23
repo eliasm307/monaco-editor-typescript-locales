@@ -11,6 +11,7 @@ test.describe("Single Editor", () => {
     test.setTimeout(60_000);
   });
 
+  // NOTE: also tests it refreshes affected model markers on locale change
   test("it can translate messages with repeated templates on locale change", async ({ page }) => {
     const storybookPage = new SingleEditorPageObject(page);
     await storybookPage.openPage({
@@ -87,4 +88,12 @@ test.describe("Single Editor", () => {
       },
     ]);
   });
+
+  // todo write tests
+  test("it updates marker translations when value changes");
+
+  // also tests markers are not doubled up when there are multiple models
+  test("it can translate multiple models of the same js language simultaneously");
+
+  test("test it can translate multiple models of different js languages simultaneously");
 });
