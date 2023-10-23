@@ -3,7 +3,7 @@ import { expect } from "@playwright/test";
 import { createTestPageUrlWithConfig } from "../../utils";
 import { TestMarkerData, BaseTestPageConfig } from "../../types";
 import { LanguageId, MonacoModule } from "@packages/common/src/types";
-import { editor } from "monaco-editor";
+import { editor, IPosition } from "monaco-editor";
 
 declare global {
   interface Window {
@@ -17,6 +17,11 @@ class Assertions {
   constructor(private object: SingleEditorPageObject) {}
 
   async actualMarkersMatch(expectedMarkers: TestMarkerData[]) {
+    if (!expectedMarkers.length) {
+      await expect(this.object.editorMarkersDataContainer).toBeHidden();
+      return;
+    }
+
     let actualConfigText = await this.object.editorMarkersDataContainer.innerText();
     // NOTE reading text from DOM can result in different whitespace characters so this is to normalise the text
     // ie https://stackoverflow.com/questions/24087378/jquery-reads-char-code-160-instead-of-32-for-space-from-chrome-textarea
@@ -33,6 +38,24 @@ class Actions {
     await this.object.page.evaluate((value) => {
       window.editor.setValue(value);
     }, value);
+  }
+
+  async setCursorToPosition(position: IPosition) {
+    await this.object.page.evaluate((position: IPosition) => {
+      window.editor.setPosition(position);
+    }, position);
+  }
+
+  async typeValueAtCurrentCursorPosition(value: string) {
+    await this.object.page.evaluate((value) => {
+      window.editor.trigger("keyboard", "type", { text: value });
+    }, value);
+  }
+
+  async backspaceAtCurrentCursorPosition() {
+    await this.object.page.evaluate(() => {
+      window.editor.trigger("keyboard", "deleteLeft", {});
+    });
   }
 }
 

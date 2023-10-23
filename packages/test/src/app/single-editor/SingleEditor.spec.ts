@@ -94,8 +94,49 @@ test.describe("Single Editor", () => {
   });
 
   // todo write tests
-  test("it updates marker translations when value changes", async ({ page }) => {
-    throw new Error("Not implemented");
+  test("it updates marker translations on type", async ({ page }) => {
+    const storybookPage = new SingleEditorPageObject(page);
+    await storybookPage.openPage({
+      locale: "fr",
+      editor0Language: "typescript",
+    });
+
+    await storybookPage.actions.setEditorValue("");
+    await storybookPage.assert.actualMarkersMatch([]);
+
+    await storybookPage.actions.setCursorToPosition({ lineNumber: 1, column: 1 });
+    await storybookPage.actions.typeValueAtCurrentCursorPosition("x");
+    await storybookPage.assert.actualMarkersMatch([
+      {
+        owner: "typescript",
+        code: "2304",
+        message: "Le nom 'x' est introuvable.",
+        resource: "inmemory://model/1",
+      },
+    ]);
+
+    await storybookPage.actions.typeValueAtCurrentCursorPosition("x");
+    await storybookPage.assert.actualMarkersMatch([
+      {
+        owner: "typescript",
+        code: "2304",
+        message: "Le nom 'xx' est introuvable.",
+        resource: "inmemory://model/1",
+      },
+    ]);
+
+    await storybookPage.actions.backspaceAtCurrentCursorPosition();
+    await storybookPage.assert.actualMarkersMatch([
+      {
+        owner: "typescript",
+        code: "2304",
+        message: "Le nom 'x' est introuvable.",
+        resource: "inmemory://model/1",
+      },
+    ]);
+
+    await storybookPage.actions.backspaceAtCurrentCursorPosition();
+    await storybookPage.assert.actualMarkersMatch([]);
   });
 
   // also tests markers are not doubled up when there are multiple models
