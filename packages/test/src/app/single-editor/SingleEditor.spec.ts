@@ -38,7 +38,7 @@ test.describe("Single Editor", () => {
     await storybookPage.editorLocaleSelect.selectOption("fr");
     await storybookPage.assert.actualMarkersMatch([
       {
-        owner: "typescript-fr",
+        owner: "typescript",
         code: "2749",
         message:
           "'str' fait référence à une valeur, mais il est utilisé ici en tant que type. Est-ce que vous avez voulu utiliser 'typeof str' ?",
@@ -50,7 +50,7 @@ test.describe("Single Editor", () => {
     await storybookPage.editorLocaleSelect.selectOption("de");
     await storybookPage.assert.actualMarkersMatch([
       {
-        owner: "typescript-de",
+        owner: "typescript",
         code: "2749",
         message:
           '"str" bezieht sich auf einen Wert, wird hier jedoch als Typ verwendet. Meinten Sie "typeof str"?',
@@ -84,7 +84,7 @@ test.describe("Single Editor", () => {
 
     await storybookPage.assert.actualMarkersMatch([
       {
-        owner: "typescript-fr",
+        owner: "typescript",
         code: "2749",
         message:
           "'str' fait référence à une valeur, mais il est utilisé ici en tant que type. Est-ce que vous avez voulu utiliser 'typeof str' ?",

@@ -14,21 +14,7 @@ import { Monaco } from "@monaco-editor/react";
 import { editor } from "monaco-editor";
 import LocaleSelector from "@packages/common/src/components/LocaleSelect";
 
-const JS_CODE_WITH_ISSUES = `const str: number = "";
-
-const function = 5;
-
-const a: str = 1;
-
-c =;
-
-return;
-
-fnc() {
-  // this produces a parser error message below,
-  // not from the Typescript worker,
-  // which doesn't get translated
-`;
+const JS_CODE_WITH_ISSUES = `const f = x;`;
 
 export default function Page() {
   const [isMounted, setIsMounted] = useState(false);
@@ -71,12 +57,13 @@ export default function Page() {
   if (!isMounted) return null;
 
   const languageId = getLanguageFromUrlForEditorIndex(0);
+  const locale = getLocaleFromUrl();
 
   return (
     <Grid templateColumns='1fr 1fr' height='100dvh'>
       <EditorPanel
         editor={{
-          locale: getLocaleFromUrl(),
+          locale,
           languageId,
           defaultValue: JS_CODE_WITH_ISSUES,
           onMonacoLoaded: setMonaco,
@@ -88,6 +75,7 @@ export default function Page() {
           <Text>Locale</Text>
           <LocaleSelector
             id='editor-locale-select'
+            defaultLocale={locale}
             onChange={(newLocale) => {
               if (!monaco) return;
               const defaults = getDefaultsForLanguageId({ monaco, languageId });

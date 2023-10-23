@@ -1,5 +1,5 @@
 /* eslint-disable functional-core/purity */
-import type { editor, languages, Uri } from "monaco-editor";
+import type { editor, languages, MarkerTag, Uri } from "monaco-editor";
 
 const TYPESCRIPT_WORKER_LANGUAGE_IDS = ["typescript", "javascript"] as const;
 
@@ -13,6 +13,11 @@ type MonacoModule = typeof import("monaco-editor");
  * This is to make sure we only initialise each instance once
  */
 const initialisedMonacoInstances = new WeakSet<MonacoModule>();
+
+/**
+ * @remark It is assumed that future MarkerTag values will not be negative and not conflict with this value
+ */
+const IS_TRANSLATED_TAG = -1 as MarkerTag;
 
 /**
  * Sets up the given Monaco instance to translate any JS/TS diagnostic marker messages
@@ -47,9 +52,9 @@ export function register(monaco: MonacoModule): void {
 
   // setup JS/TS message translation on content change
   // NOTE: assuming monaco fires this with debouncing etc so its performant to handle this directly without further buffering etc
-  monaco.editor.onDidChangeMarkers(() => {
-    void translateMarkersForLanguage({ monaco, languageId: "javascript" });
-    void translateMarkersForLanguage({ monaco, languageId: "typescript" });
+  monaco.editor.onDidChangeMarkers((affectedUris) => {
+    void translateMarkersForLanguage({ monaco, languageId: "javascript", affectedUris });
+    void translateMarkersForLanguage({ monaco, languageId: "typescript", affectedUris });
   });
 }
 
@@ -89,23 +94,29 @@ function onLanguageLocaleChange({
   if (oldLocale === newLocale) {
     return; // no change
   }
-
-  // Remove all custom markers from previous locale and update current locale markers
-  monaco.editor.removeAllMarkers(`${languageId}-${oldLocale}`);
   lastSetLanguageLocales[languageId] = newLocale;
-
-  // NOTE: this is triggered by a compiler options change which also seems to refresh the markers,
-  // so we assume we will have the default english markers at this point
   void translateMarkersForLanguage({ monaco, languageId });
 }
 
 async function translateMarkersForLanguage({
   monaco,
   languageId,
+  affectedUris,
 }: {
   monaco: MonacoModule;
   languageId: LanguageId;
+  affectedUris?: readonly Uri[];
 }): Promise<void> {
+  // if we have a list of affected models then we check if any of them are of the language we are translating, otherwise we translate everything
+  if (affectedUris) {
+    const relevantModelsAffected = affectedUris.some((uri) => {
+      return monaco.editor.getModel(uri)?.getLanguageId() === languageId;
+    });
+    if (!relevantModelsAffected) {
+      return; // no models of the language we are translating were affected
+    }
+  }
+
   const targetLocale = lastSetLanguageLocales[languageId];
   if (targetLocale === "en") {
     return; // no translation needed, assume default markers are in english
@@ -114,17 +125,17 @@ async function translateMarkersForLanguage({
   try {
     // NOTE: assumes the JS/TS messages will always have the owner for their markers set as the language ID
     // NOTE: we assume the current markers are in english and previous custom markers have been removed when this is called
-    const defaultJsOrTsMarkers = monaco.editor.getModelMarkers({ owner: languageId });
-    if (!defaultJsOrTsMarkers.length) {
+    const markers = monaco.editor.getModelMarkers({ owner: languageId });
+    if (!markers.length) {
       return; // no markers to translate or we already translated them
     }
-    const translatedMarkers = await translateMarkers({ defaultJsOrTsMarkers, targetLocale });
 
-    // remove english markers after getting them but before setting the new translated markers to not trigger marker change handler recursively
-    // NOTE: this is so the user only sees TS/JS messages in their language and not the original english message also
-    // NOTE: if a message cant be translated it will be maintained in english
-    monaco.editor.removeAllMarkers(languageId);
+    const requiresTranslation = markers.some((marker) => !marker.tags?.includes(IS_TRANSLATED_TAG));
+    if (!requiresTranslation) {
+      return; // all markers have already been translated
+    }
 
+    const translatedMarkers = await translateMarkers({ markers, targetLocale });
     translatedMarkers
       // group markers by resource
       .reduce((resourceMarkersMap, marker) => {
@@ -134,14 +145,12 @@ async function translateMarkersForLanguage({
         return resourceMarkersMap;
       }, new Map<Uri, editor.IMarker[]>())
       // set translated markers for each model resource
-      .forEach((markers, modelUri) => {
+      .forEach((translatedMarkersForModel, modelUri) => {
         const model = monaco.editor.getModel(modelUri);
         // not sure if non model resources can have markers but checking just in case
         if (model) {
-          // NOTE: need to set a different owner ID as setting the markers here will trigger the marker change listener which recursively triggers this method again,
-          //    but with a non ts/js owner the markers wont be processed again as we filter for js/ts markers specifically,
-          //    so there will be no markers found and the markers aren't set again
-          monaco.editor.setModelMarkers(model, `${languageId}-${targetLocale}`, markers);
+          // NOTE: need to set the same owner so the language service can find and manage the markers during editing
+          monaco.editor.setModelMarkers(model, languageId, translatedMarkersForModel);
         }
       });
   } catch (error) {
@@ -150,13 +159,13 @@ async function translateMarkersForLanguage({
 }
 
 async function translateMarkers({
-  defaultJsOrTsMarkers,
+  markers,
   targetLocale,
 }: {
   /**
    * @remark assumes the default markers are in english
    */
-  defaultJsOrTsMarkers: editor.IMarker[];
+  markers: editor.IMarker[];
   targetLocale: string;
 }) {
   const [englishDiagnosticMessageTemplatesMap, targetLocaleDiagnosticMessageTemplatesMap] =
@@ -165,27 +174,29 @@ async function translateMarkers({
       getDiagnosticMessageTemplatesForLocale(targetLocale),
     ]);
 
-  return defaultJsOrTsMarkers.map((defaultMarker) => {
-    if (!defaultMarker.code) {
-      return defaultMarker; // marker doesn't have a code so we cant translate, keep the original
+  return markers.map((marker) => {
+    if (!marker.code) {
+      return marker; // marker doesn't have a code so we cant translate, keep the original
+    }
+    if (marker.tags?.includes(IS_TRANSLATED_TAG)) {
+      return marker; // marker has already been translated
     }
 
-    const messageCode = Number(
-      typeof defaultMarker.code === "object" ? defaultMarker.code.value : defaultMarker.code,
-    );
+    const messageCode = Number(typeof marker.code === "object" ? marker.code.value : marker.code);
     const translatedMessage = translatedDiagnosticMessage({
-      englishMessage: defaultMarker.message,
+      englishMessage: marker.message,
       englishMessageTemplate: englishDiagnosticMessageTemplatesMap[messageCode],
       localeMessageTemplate: targetLocaleDiagnosticMessageTemplatesMap[messageCode],
     });
 
     if (!translatedMessage) {
-      return defaultMarker; // could not translate the message, so keep the original
+      return marker; // could not translate the message, so keep the original
     }
 
     return {
-      ...defaultMarker,
+      ...marker,
       message: translatedMessage, // replace the message with the translated version
+      tags: [...(marker.tags || []), IS_TRANSLATED_TAG], // add a tag to indicate this marker has been translated
     };
   });
 }
