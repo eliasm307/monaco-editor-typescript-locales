@@ -16,12 +16,12 @@
     "eslint-plugin-react-hooks": "To avoid issues with eslint not finding the right version as next js configs also define this with different versions sometimes"
   },
   "devDependencies": {
-    "@eliasm307/config": "^0.40.0",
+    "@eliasm307/config": "^0.41.0",
     "@types/node": "^18.18.6",
     "@types/react": "^18.2.31",
     "@types/react-dom": "^18.2.14",
-    "@typescript-eslint/eslint-plugin": "^6.8.0",
-    "@typescript-eslint/parser": "^6.8.0",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
     "concurrently": "^8.2.2",
     "eslint": "^8.52.0",
     "eslint-config-next": "13.5.6",

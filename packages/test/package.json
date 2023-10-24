@@ -16,6 +16,6 @@
     "monaco-editor-typescript-locales": "link:../monaco-util"
   },
   "devDependencies": {
-    "@playwright/test": "^1.38.0"
+    "@playwright/test": "^1.39.0"
   }
 }
