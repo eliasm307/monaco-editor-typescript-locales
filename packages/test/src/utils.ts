@@ -1,7 +1,7 @@
 import { LanguageId, MonacoModule } from "@packages/common/src/types";
 import { editor, languages } from "monaco-editor";
 import { TEST_SITE_BASE_URL } from "./constants";
-import { TestMarkerData } from "./types";
+import { EditorId, TestMarkerData } from "./types";
 
 export function getLocaleFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -24,7 +24,7 @@ export function isRelevantMarker(marker: editor.IMarker): boolean {
 
 type UrlConfigMap = Record<string, string | number | boolean | null | undefined>;
 
-export function createTestPageUrlWithConfig({
+export function createTestPageUrlUsingConfig({
   path,
   config,
 }: {
@@ -90,7 +90,7 @@ export function serialiseMarkers(markers: editor.IMarker[]): string {
   const markersData: TestMarkerData[] = markers.map((marker) => {
     const { message, owner, resource, code } = marker;
     const codeAsString = typeof code === "string" ? code : code?.value;
-    return { code: codeAsString, message, owner, resource: resource.toString() || null };
+    return { code: codeAsString, message, owner, resource: resource.path };
   });
   console.log("markers:", markers);
   return JSON.stringify(markersData, null, 2);
@@ -111,4 +111,8 @@ export function getDefaultsForLanguageId({
     default:
       throw new Error(`Unsupported language ID: ${languageId}`);
   }
+}
+
+export function createIdForEditorIndex(editorIndex: number): EditorId {
+  return `editor${editorIndex}`;
 }

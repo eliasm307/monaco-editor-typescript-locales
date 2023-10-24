@@ -8,3 +8,5 @@ export type TestMarkerData = {
 export type BaseTestPageConfig = {
   locale?: string;
 };
+
+export type EditorId = `editor${number}`;

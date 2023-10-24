@@ -1,17 +1,10 @@
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
-import { createTestPageUrlWithConfig } from "../../utils";
+import { createTestPageUrlUsingConfig } from "../../utils";
 import { TestMarkerData, BaseTestPageConfig } from "../../types";
 import { LanguageId, MonacoModule } from "@packages/common/src/types";
-import { editor, IPosition } from "monaco-editor";
-
-declare global {
-  interface Window {
-    editor: editor.ICodeEditor;
-    // this is added by monaco itself
-    monaco: MonacoModule;
-  }
-}
+import { editor } from "monaco-editor";
+import EditorObject from "../../objects/EditorObject";
 
 class Assertions {
   constructor(private object: SingleEditorPageObject) {}
@@ -31,35 +24,7 @@ class Assertions {
   }
 }
 
-class Actions {
-  constructor(private object: SingleEditorPageObject) {}
-
-  async setEditorValue(value: string) {
-    await this.object.page.evaluate((value) => {
-      window.editor.setValue(value);
-    }, value);
-  }
-
-  async setCursorToPosition(position: IPosition) {
-    await this.object.page.evaluate((position: IPosition) => {
-      window.editor.setPosition(position);
-    }, position);
-  }
-
-  async typeValueAtCurrentCursorPosition(value: string) {
-    await this.object.page.evaluate((value) => {
-      window.editor.trigger("keyboard", "type", { text: value });
-    }, value);
-  }
-
-  async backspaceAtCurrentCursorPosition() {
-    await this.object.page.evaluate(() => {
-      window.editor.trigger("keyboard", "deleteLeft", {});
-    });
-  }
-}
-
-const PAGE_PATH = "/single-editor";
+export const SINGLE_EDITOR_PAGE_PATH = "/single-editor";
 
 type SingleEditorPageConfig = BaseTestPageConfig & {
   editor0Language: LanguageId;
@@ -67,12 +32,14 @@ type SingleEditorPageConfig = BaseTestPageConfig & {
 
 export default class SingleEditorPageObject {
   assert = new Assertions(this);
-  actions = new Actions(this);
+  editor: EditorObject;
 
-  constructor(public page: Page) {}
+  constructor(public page: Page) {
+    this.editor = new EditorObject(page, { index: 0 });
+  }
 
-  async openPage(config: SingleEditorPageConfig) {
-    const url = createTestPageUrlWithConfig({ path: PAGE_PATH, config });
+  async openPageUsingConfig(config: SingleEditorPageConfig) {
+    const url = createTestPageUrlUsingConfig({ path: SINGLE_EDITOR_PAGE_PATH, config });
     console.log(`Opening page: ${url}`);
     await this.page.goto(url);
 
@@ -80,10 +47,6 @@ export default class SingleEditorPageObject {
     await expect(this.editorMarkersDataContainer, {
       message: "markers data container should be visible initially",
     }).toBeVisible({ timeout: 10_000 });
-
-    await this.page.evaluate(() => {
-      window.editor = window.monaco.editor.getEditors()[0];
-    });
   }
 
   /**

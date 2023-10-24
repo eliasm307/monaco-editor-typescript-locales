@@ -11,8 +11,12 @@ import { defineConfig, devices } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "./src/app",
-  /* Run tests in files in parallel */
-  fullyParallel: true,
+  /*
+  Run tests in files in parallel,
+
+  off as it makes tests flakey as the monaco workers get confused from editors being used simultaneously (I think)
+  */
+  fullyParallel: false,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
@@ -29,6 +33,7 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
   },
+  globalSetup: require.resolve("./globalSetup.ts"),
 
   /* Configure projects for major browsers */
   projects: [

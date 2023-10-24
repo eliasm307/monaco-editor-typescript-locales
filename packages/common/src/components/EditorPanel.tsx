@@ -5,9 +5,11 @@ import { Box, Heading, VStack } from "@chakra-ui/react";
 import { Editor } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
 import type { LanguageId, MonacoModule } from "../types";
+import { getLanguageIdDefaults } from "../utils";
 
 export type EditorPanelProps = BoxProps & {
   editor: {
+    id?: string;
     languageId: LanguageId;
     locale?: string;
     defaultValue: string;
@@ -17,7 +19,7 @@ export type EditorPanelProps = BoxProps & {
 };
 
 export default function EditorPanel({
-  editor: { languageId, locale, defaultValue, onMonacoLoaded, onEditorMounted },
+  editor: { id, languageId, locale, defaultValue, onMonacoLoaded, onEditorMounted },
   ...boxProps
 }: EditorPanelProps) {
   const [monaco, setMonaco] = useState<typeof import("monaco-editor")>();
@@ -25,10 +27,7 @@ export default function EditorPanel({
 
   useEffect(() => {
     if (!monaco) return;
-    const languageDefaults = getLanguageIdDefaults({
-      monaco,
-      languageId,
-    });
+    const languageDefaults = getLanguageIdDefaults({ monaco, languageId });
 
     // update compiler options `locale` and keep other existing options
     languageDefaults.setCompilerOptions({
@@ -50,7 +49,7 @@ export default function EditorPanel({
       {...boxProps}
     >
       <Heading as='h2' width='100%' flex='none' size='sm' textAlign='center'>
-        {getLanguageDisplayName(languageId)} Editor
+        {getLanguageDisplayName(languageId)} Editor {id && `(${id})`}
       </Heading>
       <Box
         className='monaco-editor-container'
@@ -62,6 +61,7 @@ export default function EditorPanel({
           key={`${languageId}-${locale}`} // force remount when locale changes
           defaultLanguage={languageId}
           defaultValue={defaultValue}
+          defaultPath={id}
           options={{
             automaticLayout: true,
             minimap: { enabled: false },
@@ -86,23 +86,6 @@ function getLanguageDisplayName(languageId: string) {
       return "TypeScript";
     case "javascript":
       return "JavaScript";
-    default:
-      throw Error(`Unsupported language ID "${languageId}"`);
-  }
-}
-
-function getLanguageIdDefaults({
-  monaco,
-  languageId,
-}: {
-  monaco: MonacoModule;
-  languageId: string;
-}) {
-  switch (languageId) {
-    case "typescript":
-      return monaco.languages.typescript.typescriptDefaults;
-    case "javascript":
-      return monaco.languages.typescript.javascriptDefaults;
     default:
       throw Error(`Unsupported language ID "${languageId}"`);
   }

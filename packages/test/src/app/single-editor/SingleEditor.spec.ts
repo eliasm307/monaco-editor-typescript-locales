@@ -2,153 +2,125 @@ import { assertTestSiteIsRunning } from "../../utils";
 import SingleEditorPageObject from "./SingleEditorPageObject";
 import { test } from "@playwright/test";
 
-test.describe("Single Editor", () => {
-  test.beforeAll(async () => {
-    await assertTestSiteIsRunning();
+// NOTE: also tests it refreshes affected model markers on locale change
+test("it can translate messages with repeated templates on locale change", async ({ page }) => {
+  const pageObject = new SingleEditorPageObject(page);
+  await pageObject.openPageUsingConfig({
+    locale: "en",
+    editor0Language: "typescript",
   });
 
-  test.beforeEach(async () => {
-    test.setTimeout(60_000);
+  await pageObject.editor.actions.setValue(["const str = 1;", "const bool: str = 5;"].join("\n"));
+
+  // initial markers in english
+  await pageObject.assert.actualMarkersMatch([
+    {
+      owner: "typescript",
+      code: "2749",
+      message:
+        "'str' refers to a value, but is being used as a type here. Did you mean 'typeof str'?",
+      resource: "/editor0",
+    },
+  ]);
+
+  // change locale from default
+  await pageObject.editorLocaleSelect.selectOption("fr");
+  await pageObject.assert.actualMarkersMatch([
+    {
+      owner: "typescript",
+      code: "2749",
+      message:
+        "'str' fait référence à une valeur, mais il est utilisé ici en tant que type. Est-ce que vous avez voulu utiliser 'typeof str' ?",
+      resource: "/editor0",
+    },
+  ]);
+
+  // change locale from custom locale to another custom locale
+  await pageObject.editorLocaleSelect.selectOption("de");
+  await pageObject.assert.actualMarkersMatch([
+    {
+      owner: "typescript",
+      code: "2749",
+      message:
+        '"str" bezieht sich auf einen Wert, wird hier jedoch als Typ verwendet. Meinten Sie "typeof str"?',
+      resource: "/editor0",
+    },
+  ]);
+
+  // can go back to original locale from custom locale
+  await pageObject.editorLocaleSelect.selectOption("en");
+  await pageObject.assert.actualMarkersMatch([
+    {
+      owner: "typescript",
+      code: "2749",
+      message:
+        "'str' refers to a value, but is being used as a type here. Did you mean 'typeof str'?",
+      resource: "/editor0",
+    },
+  ]);
+});
+
+test("can translate messages with repeated templates on load", async ({ page }) => {
+  const pageObject = new SingleEditorPageObject(page);
+  await pageObject.openPageUsingConfig({
+    locale: "fr",
+    editor0Language: "typescript",
   });
 
-  // NOTE: also tests it refreshes affected model markers on locale change
-  test("it can translate messages with repeated templates on locale change", async ({ page }) => {
-    const storybookPage = new SingleEditorPageObject(page);
-    await storybookPage.openPage({
-      locale: "en",
-      editor0Language: "typescript",
-    });
+  await pageObject.editor.actions.setValue(["const str = 1;", "const bool: str = 5;"].join("\n"));
 
-    await storybookPage.actions.setEditorValue(
-      ["const str = 1;", "const bool: str = 5;"].join("\n"),
-    );
+  await pageObject.assert.actualMarkersMatch([
+    {
+      owner: "typescript",
+      code: "2749",
+      message:
+        "'str' fait référence à une valeur, mais il est utilisé ici en tant que type. Est-ce que vous avez voulu utiliser 'typeof str' ?",
+      resource: "/editor0",
+    },
+  ]);
+});
 
-    // initial markers in english
-    await storybookPage.assert.actualMarkersMatch([
-      {
-        owner: "typescript",
-        code: "2749",
-        message:
-          "'str' refers to a value, but is being used as a type here. Did you mean 'typeof str'?",
-        resource: "inmemory://model/1",
-      },
-    ]);
-
-    // change locale from default
-    await storybookPage.editorLocaleSelect.selectOption("fr");
-    await storybookPage.assert.actualMarkersMatch([
-      {
-        owner: "typescript",
-        code: "2749",
-        message:
-          "'str' fait référence à une valeur, mais il est utilisé ici en tant que type. Est-ce que vous avez voulu utiliser 'typeof str' ?",
-        resource: "inmemory://model/1",
-      },
-    ]);
-
-    // change locale from custom locale to another custom locale
-    await storybookPage.editorLocaleSelect.selectOption("de");
-    await storybookPage.assert.actualMarkersMatch([
-      {
-        owner: "typescript",
-        code: "2749",
-        message:
-          '"str" bezieht sich auf einen Wert, wird hier jedoch als Typ verwendet. Meinten Sie "typeof str"?',
-        resource: "inmemory://model/1",
-      },
-    ]);
-
-    // can go back to original locale from custom locale
-    await storybookPage.editorLocaleSelect.selectOption("en");
-    await storybookPage.assert.actualMarkersMatch([
-      {
-        owner: "typescript",
-        code: "2749",
-        message:
-          "'str' refers to a value, but is being used as a type here. Did you mean 'typeof str'?",
-        resource: "inmemory://model/1",
-      },
-    ]);
+test("it updates marker translations on type", async ({ page }) => {
+  const pageObject = new SingleEditorPageObject(page);
+  await pageObject.openPageUsingConfig({
+    locale: "fr",
+    editor0Language: "typescript",
   });
 
-  test("can translate messages with repeated templates on load", async ({ page }) => {
-    const storybookPage = new SingleEditorPageObject(page);
-    await storybookPage.openPage({
-      locale: "fr",
-      editor0Language: "typescript",
-    });
+  await pageObject.editor.actions.setValue("");
+  await pageObject.assert.actualMarkersMatch([]);
 
-    await storybookPage.actions.setEditorValue(
-      ["const str = 1;", "const bool: str = 5;"].join("\n"),
-    );
+  await pageObject.editor.actions.setCursorToPosition({ lineNumber: 1, column: 1 });
+  await pageObject.editor.actions.typeValueAtCurrentCursorPosition("x");
+  await pageObject.assert.actualMarkersMatch([
+    {
+      owner: "typescript",
+      code: "2304",
+      message: "Le nom 'x' est introuvable.",
+      resource: "/editor0",
+    },
+  ]);
 
-    await storybookPage.assert.actualMarkersMatch([
-      {
-        owner: "typescript",
-        code: "2749",
-        message:
-          "'str' fait référence à une valeur, mais il est utilisé ici en tant que type. Est-ce que vous avez voulu utiliser 'typeof str' ?",
-        resource: "inmemory://model/1",
-      },
-    ]);
-  });
+  await pageObject.editor.actions.typeValueAtCurrentCursorPosition("x");
+  await pageObject.assert.actualMarkersMatch([
+    {
+      owner: "typescript",
+      code: "2304",
+      message: "Le nom 'xx' est introuvable.",
+      resource: "/editor0",
+    },
+  ]);
 
-  // todo write tests
-  test("it updates marker translations on type", async ({ page }) => {
-    const storybookPage = new SingleEditorPageObject(page);
-    await storybookPage.openPage({
-      locale: "fr",
-      editor0Language: "typescript",
-    });
+  await pageObject.editor.actions.backspaceAtCurrentCursorPosition();
+  await pageObject.assert.actualMarkersMatch([
+    {
+      owner: "typescript",
+      code: "2304",
+      message: "Le nom 'x' est introuvable.",
+      resource: "/editor0",
+    },
+  ]);
 
-    await storybookPage.actions.setEditorValue("");
-    await storybookPage.assert.actualMarkersMatch([]);
-
-    await storybookPage.actions.setCursorToPosition({ lineNumber: 1, column: 1 });
-    await storybookPage.actions.typeValueAtCurrentCursorPosition("x");
-    await storybookPage.assert.actualMarkersMatch([
-      {
-        owner: "typescript",
-        code: "2304",
-        message: "Le nom 'x' est introuvable.",
-        resource: "inmemory://model/1",
-      },
-    ]);
-
-    await storybookPage.actions.typeValueAtCurrentCursorPosition("x");
-    await storybookPage.assert.actualMarkersMatch([
-      {
-        owner: "typescript",
-        code: "2304",
-        message: "Le nom 'xx' est introuvable.",
-        resource: "inmemory://model/1",
-      },
-    ]);
-
-    await storybookPage.actions.backspaceAtCurrentCursorPosition();
-    await storybookPage.assert.actualMarkersMatch([
-      {
-        owner: "typescript",
-        code: "2304",
-        message: "Le nom 'x' est introuvable.",
-        resource: "inmemory://model/1",
-      },
-    ]);
-
-    await storybookPage.actions.backspaceAtCurrentCursorPosition();
-    await storybookPage.assert.actualMarkersMatch([]);
-  });
-
-  // also tests markers are not doubled up when there are multiple models
-  test("it can translate multiple models of the same js language simultaneously", async ({
-    page,
-  }) => {
-    throw new Error("Not implemented");
-  });
-
-  test("test it can translate multiple models of different js languages simultaneously", async ({
-    page,
-  }) => {
-    throw new Error("Not implemented");
-  });
+  await pageObject.editor.actions.backspaceAtCurrentCursorPosition();
+  await pageObject.assert.actualMarkersMatch([]);
 });

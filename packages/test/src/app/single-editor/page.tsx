@@ -3,6 +3,7 @@
 import { Grid, HStack, Heading, Text, Textarea, VStack } from "@chakra-ui/react";
 import EditorPanel from "@packages/common/src/components/EditorPanel";
 import {
+  createIdForEditorIndex,
   getDefaultsForLanguageId,
   getLanguageFromUrlForEditorIndex,
   getLocaleFromUrl,
@@ -13,13 +14,13 @@ import { useEffect, useState } from "react";
 import { Monaco } from "@monaco-editor/react";
 import { editor } from "monaco-editor";
 import LocaleSelector from "@packages/common/src/components/LocaleSelect";
+import AllMarkersDataPanel from "../../components/AllMarkersDataPanel";
 
 const JS_CODE_WITH_ISSUES = `const f = x;`;
 
 export default function Page() {
   const [isMounted, setIsMounted] = useState(false);
   const [monaco, setMonaco] = useState<Monaco>();
-  const [editor, setEditor] = useState<editor.IStandaloneCodeEditor>();
   const [currentMarkers, setCurrentMarkers] = useState<editor.IMarker[]>([]);
 
   useEffect(() => {
@@ -45,12 +46,6 @@ export default function Page() {
   }, [monaco]);
 
   useEffect(() => {
-    editor?.onDidChangeModelContent((e) => {
-      setCurrentMarkers([]);
-    });
-  });
-
-  useEffect(() => {
     setIsMounted(true);
   }, []);
 
@@ -58,16 +53,23 @@ export default function Page() {
 
   const languageId = getLanguageFromUrlForEditorIndex(0);
   const locale = getLocaleFromUrl();
+  const editorId = createIdForEditorIndex(0);
 
   return (
     <Grid templateColumns='1fr 1fr' height='100dvh'>
       <EditorPanel
         editor={{
+          id: editorId,
           locale,
           languageId,
           defaultValue: JS_CODE_WITH_ISSUES,
           onMonacoLoaded: setMonaco,
-          onEditorMounted: setEditor,
+          onEditorMounted: (editor) => {
+            window[editorId] = editor;
+            editor?.onDidChangeModelContent((e) => {
+              setCurrentMarkers([]);
+            });
+          },
         }}
       />
       <VStack height='100%' overflow='hidden'>
@@ -86,20 +88,7 @@ export default function Page() {
             }}
           />
         </HStack>
-        <Heading as='h2' size='md'>
-          Markers
-        </Heading>
-        {currentMarkers.length && (
-          <Text
-            as='pre'
-            id='editor-markers-data-container'
-            flex={1}
-            overflow='auto'
-            whiteSpace='pre-wrap'
-          >
-            {serialiseMarkers(currentMarkers)}
-          </Text>
-        )}
+        <AllMarkersDataPanel markers={currentMarkers} flex={1} />
       </VStack>
     </Grid>
   );
