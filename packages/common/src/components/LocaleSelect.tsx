@@ -1,12 +1,13 @@
 /* eslint-disable functional-core/purity */
 import { useRef } from "react";
+import type { SelectProps } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
 import localesMetadata from "monaco-editor-typescript-locales/locales/metadata.json";
 
-type LocaleSelectProps = {
+type LocaleSelectProps = Omit<SelectProps, "onChange"> & {
   id?: string;
   defaultLocale?: string;
-  onChange: (newLocale: string) => void;
+  onChange?: (newLocale: string) => void;
 };
 
 /**
@@ -22,7 +23,7 @@ export default function LocaleSelect({ defaultLocale, onChange, ...props }: Loca
     <Select
       defaultValue={defaultLocale}
       onChange={(event) => {
-        onChange(event.target.value);
+        onChange?.(event.target.value);
       }}
       {...props}
     >

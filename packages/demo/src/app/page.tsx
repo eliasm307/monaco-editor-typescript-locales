@@ -74,21 +74,25 @@ function Header({ locale, setLocale }: { locale: string; setLocale: (locale: str
   // todo add light/dark theme switcher
 
   const reloadOnChangeRef = useRef(getUrlParam("reloadOnChange") === "true");
+  const initialLocaleRef = useRef(locale);
 
-  const onLocaleChange = useCallback((newLocale: string) => {
-    setLocale(newLocale);
-    setUrlParam("locale", newLocale);
-    if (reloadOnChangeRef.current) {
-      // NOTE: need to reload so `loader` can be reinitialized with the new locale
-      // NOTE: this is not required to change locale for TS/JS diagnostic messages
-      window.location.reload();
-    }
-  }, []);
+  const onLocaleChange = useCallback(
+    (newLocale: string) => {
+      setLocale(newLocale);
+      setUrlParam("locale", newLocale);
+      if (reloadOnChangeRef.current) {
+        // NOTE: need to reload so `loader` can be reinitialized with the new locale
+        // NOTE: this is not required to change locale for TS/JS diagnostic messages
+        window.location.reload();
+      }
+    },
+    [setLocale],
+  );
 
-  const onReloadCheckBoxChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((e) => {
-    reloadOnChangeRef.current = e.target.checked;
-    setUrlParam("reloadOnChange", e.target.checked);
-  }, []);
+  // const onReloadCheckBoxChange: React.ChangeEventHandler<HTMLInputElement> = useCallback((e) => {
+  //   reloadOnChangeRef.current = e.target.checked;
+  //   setUrlParam("reloadOnChange", e.target.checked);
+  // }, []);
 
   return (
     <VStack
@@ -107,14 +111,21 @@ function Header({ locale, setLocale }: { locale: string; setLocale: (locale: str
         <Tooltip
           label={`Diagnostic messages translated using Typescript Version: ${localesMetadata.generatedFromTypescriptVersion}`}
         >
-          <Text whiteSpace='nowrap'>Current Locale:</Text>
+          <Text whiteSpace='nowrap'>TypeScript Worker Locale:</Text>
         </Tooltip>
         <LocaleSelect defaultLocale={locale} onChange={onLocaleChange} />
-        <Tooltip label='The Typescript/JavaScript messages update when the locale is changed however other editor text requires a refresh to update the text to the new locale'>
+        <Tooltip
+          label='Requires page refresh to match the TypeScript Worker locale'
+          isDisabled={initialLocaleRef.current === locale}
+        >
+          <Text whiteSpace='nowrap'>Monaco Editor Locale:</Text>
+        </Tooltip>
+        <LocaleSelect defaultLocale={initialLocaleRef.current} isDisabled />
+        {/* <Tooltip label='The Typescript/JavaScript messages update when the locale is changed however other editor text requires a refresh to update the text to the new locale'>
           <Checkbox flex='none' onChange={onReloadCheckBoxChange}>
             Reload on Change
           </Checkbox>
-        </Tooltip>
+        </Tooltip> */}
       </HStack>
     </VStack>
   );
@@ -139,6 +150,7 @@ fnc() {
 function Editors({ locale }: { locale: string }) {
   const [state, setState] = useState<"idle" | "loading">("idle");
 
+  // load monaco using initial locale
   useEffect(() => {
     loader.config({
       "vs/nls": { availableLanguages: { "*": locale === "en" ? undefined : locale } },
@@ -155,7 +167,10 @@ function Editors({ locale }: { locale: string }) {
     void loader.init().then(() => {
       setState("idle");
     });
-  }, [locale]);
+
+    // load once on mount, if this needs to change then the page should be reloaded
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (state === "loading") {
     return (

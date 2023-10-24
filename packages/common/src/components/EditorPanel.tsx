@@ -58,7 +58,6 @@ export default function EditorPanel({
         height='100%'
       >
         <Editor
-          key={`${languageId}-${locale}`} // force remount when locale changes
           defaultLanguage={languageId}
           defaultValue={defaultValue}
           defaultPath={id}

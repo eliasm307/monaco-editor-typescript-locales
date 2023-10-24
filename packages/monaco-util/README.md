@@ -1,5 +1,7 @@
 # Summary
 
+todo write readme
+
 The Typescript compiler options expose a `locale` option however at the moment this does nothing when changed and diagnostic messages are always in English.
 
 This packages adds behaviour to translate Typescript diagnostic messages into the locale specified in the compiler options `locale` property.
