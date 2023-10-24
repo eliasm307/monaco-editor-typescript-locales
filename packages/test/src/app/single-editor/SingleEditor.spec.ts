@@ -1,6 +1,5 @@
-import { assertTestSiteIsRunning } from "../../utils";
-import SingleEditorPageObject from "./SingleEditorPageObject";
 import { test } from "@playwright/test";
+import SingleEditorPageObject from "./SingleEditorPageObject";
 
 // NOTE: also tests it refreshes affected model markers on locale change
 test("it can translate messages with repeated templates on locale change", async ({ page }) => {

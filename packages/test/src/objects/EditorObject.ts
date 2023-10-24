@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-shadow */
 import type { Page } from "@playwright/test";
-import { MonacoModule } from "@packages/common/src/types";
-import { editor, IPosition } from "monaco-editor";
+import type { MonacoModule } from "@packages/common/src/types";
+import type { editor, IPosition } from "monaco-editor";
 import { createIdForEditorIndex } from "../utils";
-import { EditorId } from "../types";
+import type { EditorId } from "../types";
 
 type EditorMap = {
   // we will add these
@@ -10,6 +11,7 @@ type EditorMap = {
 };
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface Window extends EditorMap {
     // this is added by monaco itself
     monaco: MonacoModule;

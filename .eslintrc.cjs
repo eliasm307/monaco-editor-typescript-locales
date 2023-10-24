@@ -3,6 +3,7 @@ const baseConfig = require("@eliasm307/config/eslint")({ withReact: true, withPr
 module.exports = {
   ...baseConfig,
   root: true,
+  // plugins: baseConfig.plugins.filter((plugin) => plugin !== "react-hooks"),
   overrides: [
     ...baseConfig.overrides,
     {

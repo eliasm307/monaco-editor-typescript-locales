@@ -1,10 +1,29 @@
-import { LanguageId } from "@packages/common/src/types";
+import type { LanguageId } from "@packages/common/src/types";
+import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 import EditorObject from "../../objects/EditorObject";
-import { Page, expect } from "@playwright/test";
-import { createTestPageUrlUsingConfig as createTestPageUrlUsingConfig } from "../../utils";
-import { BaseTestPageConfig, TestMarkerData } from "../../types";
+import { createTestPageUrlUsingConfig } from "../../utils";
+import type { BaseTestPageConfig, TestMarkerData } from "../../types";
 
 export const MULTIPLE_EDITORS_PAGE_PATH = "/multiple-editors";
+
+class Assertions {
+  constructor(private object: MultipleEditorsPageObject) {}
+
+  async actualMarkersMatch(expectedMarkers: TestMarkerData[]) {
+    if (!expectedMarkers.length) {
+      await expect(this.object.editorMarkersDataContainer).toBeHidden();
+      return;
+    }
+
+    let actualConfigText = await this.object.editorMarkersDataContainer.innerText();
+    // NOTE reading text from DOM can result in different whitespace characters so this is to normalise the text
+    // ie https://stackoverflow.com/questions/24087378/jquery-reads-char-code-160-instead-of-32-for-space-from-chrome-textarea
+    actualConfigText = actualConfigText.replace(/\s/g, " ");
+    const actualMarkers: TestMarkerData[] = JSON.parse(actualConfigText);
+    expect(actualMarkers, "markers data equals").toEqual(expectedMarkers);
+  }
+}
 
 type MultipleEditorsPageConfig = BaseTestPageConfig & {
   editor0Language: LanguageId;
@@ -13,7 +32,9 @@ type MultipleEditorsPageConfig = BaseTestPageConfig & {
 
 export default class MultipleEditorsPageObject {
   editor0: EditorObject;
+
   editor1: EditorObject;
+
   assert = new Assertions(this);
 
   constructor(public page: Page) {
@@ -37,6 +58,7 @@ export default class MultipleEditorsPageObject {
 
   async openPageUsingConfig(config: MultipleEditorsPageConfig) {
     const url = createTestPageUrlUsingConfig({ path: MULTIPLE_EDITORS_PAGE_PATH, config });
+    // eslint-disable-next-line no-console
     console.log(`Opening page: ${url}`);
     await this.page.goto(url);
 
@@ -44,23 +66,5 @@ export default class MultipleEditorsPageObject {
     await expect(this.editorMarkersDataContainer, {
       message: "markers data container should be visible initially",
     }).toBeVisible({ timeout: 10_000 });
-  }
-}
-
-class Assertions {
-  constructor(private object: MultipleEditorsPageObject) {}
-
-  async actualMarkersMatch(expectedMarkers: TestMarkerData[]) {
-    if (!expectedMarkers.length) {
-      await expect(this.object.editorMarkersDataContainer).toBeHidden();
-      return;
-    }
-
-    let actualConfigText = await this.object.editorMarkersDataContainer.innerText();
-    // NOTE reading text from DOM can result in different whitespace characters so this is to normalise the text
-    // ie https://stackoverflow.com/questions/24087378/jquery-reads-char-code-160-instead-of-32-for-space-from-chrome-textarea
-    actualConfigText = actualConfigText.replace(/\s/g, " ");
-    const actualMarkers: TestMarkerData[] = JSON.parse(actualConfigText);
-    expect(actualMarkers, "markers data equals").toEqual(expectedMarkers);
   }
 }

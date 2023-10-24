@@ -14,9 +14,10 @@ import {
 import { loader } from "@monaco-editor/react";
 import localesMetadata from "monaco-editor-typescript-locales/locales/metadata.json";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Colours } from "./constants";
-import EditorPanel, { EditorPanelProps } from "@packages/common/src/components/EditorPanel";
+import type { EditorPanelProps } from "@packages/common/src/components/EditorPanel";
+import EditorPanel from "@packages/common/src/components/EditorPanel";
 import LocaleSelect from "@packages/common/src/components/LocaleSelect";
+import { Colours } from "./constants";
 
 // todo update site icons
 
@@ -151,19 +152,18 @@ function Editors({ locale }: { locale: string }) {
     }
 
     setState("loading");
-    console.log("Monaco editor init with locale", locale);
-    loader.init().then(() => {
-      console.log("Monaco editor init done");
+    void loader.init().then(() => {
       setState("idle");
     });
   }, [locale]);
 
-  if (state === "loading")
+  if (state === "loading") {
     return (
       <Center>
         <Spinner />
       </Center>
     );
+  }
 
   const baseEditorPanelProps: Partial<EditorPanelProps> = {
     height: {

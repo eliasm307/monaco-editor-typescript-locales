@@ -13,7 +13,7 @@ const site = {
     "A demo of the monaco-editor-typescript-locales package for translating Typescript/Javascript diagnostic messages in Monaco",
 };
 
-export async function generateMetadata(): Promise<Metadata> {
+export function generateMetadata(): Metadata {
   return {
     title: site.title,
     description: site.description,

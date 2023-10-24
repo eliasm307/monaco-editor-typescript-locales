@@ -1,19 +1,18 @@
 "use client";
 
-import { Grid, HStack, Heading, Text, Textarea, VStack } from "@chakra-ui/react";
+import { Grid, HStack, Text, VStack } from "@chakra-ui/react";
 import EditorPanel from "@packages/common/src/components/EditorPanel";
+import { useEffect, useState } from "react";
+import type { Monaco } from "@monaco-editor/react";
+import type { editor } from "monaco-editor";
+import LocaleSelector from "@packages/common/src/components/LocaleSelect";
 import {
   createIdForEditorIndex,
   getDefaultsForLanguageId,
   getLanguageFromUrlForEditorIndex,
   getLocaleFromUrl,
   logEvents,
-  serialiseMarkers,
 } from "../../utils";
-import { useEffect, useState } from "react";
-import { Monaco } from "@monaco-editor/react";
-import { editor } from "monaco-editor";
-import LocaleSelector from "@packages/common/src/components/LocaleSelect";
 import AllMarkersDataPanel from "../../components/AllMarkersDataPanel";
 
 const JS_CODE_WITH_ISSUES = `const`;
@@ -28,12 +27,12 @@ export default function Page() {
 
     logEvents({ type: "Monaco", instance: monaco.editor });
 
-    monaco.editor.onDidChangeMarkers((uris) => {
+    monaco.editor.onDidChangeMarkers(() => {
       setCurrentMarkers(monaco.editor.getModelMarkers({}));
     });
 
     function setupEditor(editor: editor.ICodeEditor) {
-      editor?.onDidChangeModelContent((e) => {
+      editor?.onDidChangeModelContent(() => {
         setCurrentMarkers([]);
       });
     }

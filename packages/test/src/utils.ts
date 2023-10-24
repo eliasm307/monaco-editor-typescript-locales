@@ -1,7 +1,7 @@
-import { LanguageId, MonacoModule } from "@packages/common/src/types";
-import { editor, languages } from "monaco-editor";
+import type { LanguageId, MonacoModule } from "@packages/common/src/types";
+import type { editor, languages } from "monaco-editor";
 import { TEST_SITE_BASE_URL } from "./constants";
-import { EditorId, TestMarkerData } from "./types";
+import type { EditorId, TestMarkerData } from "./types";
 
 export function getLocaleFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -80,6 +80,7 @@ export function logEvents({
       const value = instance[key];
       if (typeof value === "function") {
         value.call(instance, (...args: unknown[]) => {
+          // eslint-disable-next-line no-console
           console.log(`${type} event "${key}"`, args);
         });
       }
@@ -92,7 +93,6 @@ export function serialiseMarkers(markers: editor.IMarker[]): string {
     const codeAsString = typeof code === "string" ? code : code?.value;
     return { code: codeAsString, message, owner, resource: resource.path };
   });
-  console.log("markers:", markers);
   return JSON.stringify(markersData, null, 2);
 }
 

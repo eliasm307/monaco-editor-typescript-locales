@@ -1,5 +1,6 @@
-import { Heading, Text, VStack, BoxProps } from "@chakra-ui/react";
-import { editor } from "monaco-editor";
+import type { BoxProps } from "@chakra-ui/react";
+import { Heading, Text, VStack } from "@chakra-ui/react";
+import type { editor } from "monaco-editor";
 import { serialiseMarkers } from "../utils";
 
 export default function AllMarkersDataPanel({

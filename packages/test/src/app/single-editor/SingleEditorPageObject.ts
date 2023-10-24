@@ -1,9 +1,8 @@
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
+import type { LanguageId } from "@packages/common/src/types";
 import { createTestPageUrlUsingConfig } from "../../utils";
-import { TestMarkerData, BaseTestPageConfig } from "../../types";
-import { LanguageId, MonacoModule } from "@packages/common/src/types";
-import { editor } from "monaco-editor";
+import type { TestMarkerData, BaseTestPageConfig } from "../../types";
 import EditorObject from "../../objects/EditorObject";
 
 class Assertions {
@@ -16,8 +15,8 @@ class Assertions {
     }
 
     let actualConfigText = await this.object.editorMarkersDataContainer.innerText();
-    // NOTE reading text from DOM can result in different whitespace characters so this is to normalise the text
-    // ie https://stackoverflow.com/questions/24087378/jquery-reads-char-code-160-instead-of-32-for-space-from-chrome-textarea
+    // NOTE: reading text from DOM can result in different whitespace characters so this is to normalise the text
+    //    ie https://stackoverflow.com/questions/24087378/jquery-reads-char-code-160-instead-of-32-for-space-from-chrome-textarea
     actualConfigText = actualConfigText.replace(/\s/g, " ");
     const actualMarkers: TestMarkerData[] = JSON.parse(actualConfigText);
     expect(actualMarkers, "markers data equals").toEqual(expectedMarkers);
@@ -32,6 +31,7 @@ type SingleEditorPageConfig = BaseTestPageConfig & {
 
 export default class SingleEditorPageObject {
   assert = new Assertions(this);
+
   editor: EditorObject;
 
   constructor(public page: Page) {
@@ -40,6 +40,7 @@ export default class SingleEditorPageObject {
 
   async openPageUsingConfig(config: SingleEditorPageConfig) {
     const url = createTestPageUrlUsingConfig({ path: SINGLE_EDITOR_PAGE_PATH, config });
+    // eslint-disable-next-line no-console
     console.log(`Opening page: ${url}`);
     await this.page.goto(url);
 

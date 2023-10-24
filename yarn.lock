@@ -3197,15 +3197,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-react-hooks@npm:^4.5.0 || 5.0.0-canary-7118f5dd7-20230705":
-  version: 5.0.0-canary-7118f5dd7-20230705
-  resolution: "eslint-plugin-react-hooks@npm:5.0.0-canary-7118f5dd7-20230705"
-  peerDependencies:
-    eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0
-  checksum: 20e334e60bf5e56cf9f760598411847525c3ff826e6ae7757c8efdc60b33d47a97ddbe1b94ce95956ea9f7bbef37995b19c716be50bd44e6a1e789cba08b6224
-  languageName: node
-  linkType: hard
-
 "eslint-plugin-react-hooks@npm:^4.6.0":
   version: 4.6.0
   resolution: "eslint-plugin-react-hooks@npm:4.6.0"
@@ -4734,7 +4725,7 @@ __metadata:
     monaco-editor: ^0.44.0
     tslib: ^2.6.2
   peerDependencies:
-    monaco-editor: ">=0.34.0"
+    monaco-editor: ">=0.22.0"
   languageName: unknown
   linkType: soft
 
@@ -5522,6 +5513,7 @@ __metadata:
     eslint: ^8.52.0
     eslint-config-next: 13.5.6
     eslint-config-prettier: ^9.0.0
+    eslint-plugin-react-hooks: ^4.6.0
     prettier: ^3.0.3
     typescript: ^5.2.2
   languageName: unknown
