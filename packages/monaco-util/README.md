@@ -15,16 +15,9 @@ Below is an example of what this means, where the Monaco editor locale is set to
 
 ![Monaco editor localised to German with error that is not translated](/packages/monaco-util/assets/monaco-without-translated-message.png)
 
-You can try this for yourself using the latest version of the Monaco editor below, which is based on the [official localisation example](https://github.com/microsoft/monaco-editor/blob/main/samples/browser-amd-localized/index.html) from the Monaco editor repo:
+You can try this for yourself using the latest version of the Monaco editor using this [interactive example](https://codesandbox.io/s/monaco-localised-example-xyrfz6), which is based on the [official localisation example](https://github.com/microsoft/monaco-editor/blob/main/samples/browser-amd-localized/index.html) from the Monaco editor repo.
 
-<iframe src="https://codesandbox.io/embed/cdn-example-forked-xyrfz6?fontsize=14&hidenavigation=1&theme=dark"
-     style="width:100%; height:200px; border:0; border-radius: 4px; overflow:hidden;"
-     title="Localised Monaco Editor Example"
-     allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-     sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-   ></iframe>
-
-The example above even includes the following code to set the JS compiler options locale to German, however this does nothing currently as the messages are hard coded to English in the Typescript worker:
+The interactive example above even includes the following code to set the JS compiler options locale to German, however this does nothing currently as the messages are hard coded to English in the Typescript worker:
 
 ```js
 const jsDefaults = monaco.languages.typescript.javascriptDefaults;
@@ -85,3 +78,4 @@ tsDefaults.setCompilerOptions({
 - This assumes Typescript diagnostic messages content does not change across versions after being introduced into the TS compiler, which means this package just needs to be updated when new versions of Typescript are released and all previous versions are supported ie the messages are backward compatible.
 - This is a stop gap solution until the Monaco team implements a native Typescript worker localisation solution. The assumption of this package is this future functionality will hook into the language compiler options `locale` option, and so when that happens it should be a simple case of removing this package and the `register` calls to migrate to the official solution.
 - This only translates Typescript worker diagnostic messages, not the Monaco editor UI itself or messages from other languages or sources (e.g. linters or parsers).
+- Not all Monaco locales might be supported by Typescript and vice versa, so for some languages you might see a mix of translated and untranslated text even when using this package and setting the Monaco locale.

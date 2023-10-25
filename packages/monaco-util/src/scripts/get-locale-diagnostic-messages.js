@@ -6,6 +6,9 @@ const fs = require("node:fs");
 const glob = require("glob");
 const typescriptVersion = require("typescript/package.json").version;
 
+// todo add script to update readme with supported locales and the version of typescript they are generated from
+// todo create github action to update locale files and publish to npm periodically
+
 /** @typedef {{category: string; code: number;}} DiagnosticDetails */
 
 /** @typedef {Map<string, DiagnosticDetails>} InputDiagnosticMessageTable */
