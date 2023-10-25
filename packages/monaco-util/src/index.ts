@@ -1,4 +1,3 @@
-/* eslint-disable functional-core/purity */
 import type { editor, languages, MarkerTag, Uri } from "monaco-editor";
 
 const TYPESCRIPT_WORKER_LANGUAGE_IDS = ["typescript", "javascript"] as const;

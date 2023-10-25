@@ -1,4 +1,3 @@
-/* eslint-disable functional-core/purity */
 import { useRef } from "react";
 import type { SelectProps } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
