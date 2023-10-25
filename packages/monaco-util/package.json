@@ -29,7 +29,7 @@
     "build:code": "echo 'Building code...' && tsc -p ./tsconfig.build.json",
     "build:locales": "echo 'Building locales...' && node ./src/scripts/get-locale-diagnostic-messages.js",
     "build": "npm run build:code && npm run build:locales",
-    "prepublish:base": "echo 'Making sure TypeScript is up to date...' && yarn up typescript && yarn --top-level run lint && npm run build && node ./scripts/pre-publish.js",
+    "prepublish:base": "echo 'Making sure TypeScript is up to date...' && yarn up typescript && yarn --top-level run lint && npm run build",
     "publish:base": "cross-env GIT_RELATIVE_CWD=../.. NPM_RELATIVE_CWD=. node ../../node_modules/@eliasm307/config/dist/scripts/publish.js",
     "publish:patch": "npm run publish:base -- patch",
     "publish:minor": "npm run publish:base -- minor",
