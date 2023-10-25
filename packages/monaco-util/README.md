@@ -1,3 +1,5 @@
+[![npm version](https://img.shields.io/npm/v/monaco-editor-typescript-locales.svg)](https://www.npmjs.com/package/monaco-editor-typescript-locales)
+
 # monaco-editor-typescript-locales
 
 ## Problem
