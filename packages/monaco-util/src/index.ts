@@ -25,6 +25,7 @@ const IS_TRANSLATED_TAG = -1 as MarkerTag;
  *
  * For example the following will show messages in French for TypeScript models
  * but English for JavaScript models (if the local has not been configured for JS):
+ *
  * ```ts
  * const typescriptDefaults = monaco.languages.typescript.typescriptDefaults;
  * const currentCompilerOptions = typescriptDefaults.getCompilerOptions();
@@ -263,7 +264,6 @@ function createEnglishMessagePlaceholdersRegex({
   }
 
   const visitedPlaceholderIndexes = new Set<string>();
-  // NOTE: named capture group id needs to be a valid JS identifier (so cant be directly the index)
   const placeholdersRegexText = escapeRegExp(englishMessageTemplate).replace(
     /\\{\d+\\}/g,
     (placeholder) => {
@@ -275,6 +275,9 @@ function createEnglishMessagePlaceholdersRegex({
         return ".+";
       }
       visitedPlaceholderIndexes.add(placeholderIndex);
+      // NOTE: we use named capture groups so we have a mapping from the regex matches to the placeholder index,
+        // sometimes a higher placeholder index can be used before a lower one
+      // NOTE: named capture group id needs to be a valid JS identifier (so cant be directly the index)
       return `(?<_${placeholderIndex}>.+)`;
     },
   );

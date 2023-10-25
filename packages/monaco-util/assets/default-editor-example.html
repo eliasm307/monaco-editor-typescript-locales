@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Monaco editor</title>
+    <link
+      rel="stylesheet"
+      data-name="vs/editor/editor.main"
+      href="https://cdn.jsdelivr.net/npm/monaco-editor/min/vs/editor/editor.main.min.css"
+    />
+  </head>
+  <body>
+    <div id="container" style="height: 400px; border: 1px solid black"></div>
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor/min/vs/loader.min.js"></script>
+    <script>
+      // require is provided by loader.min.js.
+      require.config({ paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor/min/vs" } });
+      // set the locale to German
+      require.config({ "vs/nls": { availableLanguages: { "*": "de" } } });
+
+      require(["vs/editor/editor.main"], () => {
+        const defaults = monaco.languages.typescript.javascriptDefaults;
+        defaults.setCompilerOptions({
+          ...defaults.getCompilerOptions(),
+          locale: "de", // this does nothing
+        });
+
+        monaco.editor.create(document.getElementById("container"), {
+          value: `const x: string = 1;`, // will show error
+          language: "javascript",
+        });
+      });
+    </script>
+  </body>
+</html>

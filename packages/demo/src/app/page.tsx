@@ -1,16 +1,6 @@
 "use client";
 
-import {
-  Center,
-  Checkbox,
-  Grid,
-  HStack,
-  Heading,
-  Spinner,
-  Text,
-  Tooltip,
-  VStack,
-} from "@chakra-ui/react";
+import { Center, Grid, HStack, Heading, Spinner, Text, Tooltip, VStack } from "@chakra-ui/react";
 import { loader } from "@monaco-editor/react";
 import localesMetadata from "monaco-editor-typescript-locales/locales/metadata.json";
 import { useCallback, useEffect, useRef, useState } from "react";
