@@ -5,7 +5,6 @@
     "outDir": "dist",
     "sourceMap": false,
     "declaration": true,
-    "importHelpers": true,
     "removeComments": false
   },
   "include": ["src/index.ts"],
