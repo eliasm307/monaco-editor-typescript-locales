@@ -13,7 +13,7 @@ However, currently this only translates the Monaco editor UI itself and not the 
 
 Below is an example of what this means, where the Monaco editor locale is set to German and an error exists in the JavaScript code. As you can see, the text for editor actions (ie from the Monaco editor UI) is correctly translated but the error message (ie diagnostic messages from the TypeScript worker) are still in English.
 
-![Monaco editor localised to German with error that is not translated](/monaco-util/assets/monaco-without-translated-message.png)
+![Monaco editor localised to German with error that is not translated](/packages/monaco-util/assets/monaco-without-translated-message.png)
 
 You can try this for yourself using the latest version of the Monaco editor below, which is based on the [official localisation example](https://github.com/microsoft/monaco-editor/blob/main/samples/browser-amd-localized/index.html) from the Monaco editor repo:
 
@@ -39,7 +39,7 @@ jsDefaults.setCompilerOptions({
 This package adds functionality to translate JavaScript or TypeScript diagnostic messages based on the compiler options `locale` property.
 
 Below is an example of what this looks like:
-![Monaco editor with translated diagnostic message](/monaco-util/assets/monaco-with-translated-message.png)
+![Monaco editor with translated diagnostic message](/packages/monaco-util/assets/monaco-with-translated-message.png)
 
 ## Getting Started
 
