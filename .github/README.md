@@ -1,8 +1,10 @@
+[![npm version](https://img.shields.io/npm/v/monaco-editor-typescript-locales.svg)](https://www.npmjs.com/package/monaco-editor-typescript-locales)
+
 # monaco-editor-typescript-locales
 
 ## Problem
 
-The locale of the Monaco editor can be configured during load, e.g.:
+The locale of the [Monaco editor](https://github.com/microsoft/monaco-editor) can be configured during load, e.g.:
 
 ```js
 // set locale to German
@@ -29,10 +31,12 @@ jsDefaults.setCompilerOptions({
 
 ## Solution
 
-This package adds functionality to translate JavaScript or TypeScript diagnostic messages based on the compiler options `locale` property.
+This package extends Monaco and adds functionality to translate JavaScript or TypeScript diagnostic messages based on the compiler options `locale` property.
 
 Below is an example of what this looks like:
 ![Monaco editor with translated diagnostic message](/packages/monaco-util/assets/monaco-with-translated-message.png)
+
+ie the diagnostic message is now translated to German to match the Monaco editor locale.
 
 ## Getting Started
 
