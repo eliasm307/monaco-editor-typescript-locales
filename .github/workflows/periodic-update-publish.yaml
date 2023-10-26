@@ -1,0 +1,28 @@
+name: Periodic update and publish
+
+on:
+  schedule:
+    - cron: "0 10 * * *" # Every day at 10:00 UTC
+
+jobs:
+  run-linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          registry-url: "https://registry.npmjs.org"
+
+      - name: Install dependencies
+        run: yarn install --immutable --immutable-cache --check-cache
+
+      - name: Update and publish
+        run: yarn cwd --packages/monaco-util run publish:minor
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
