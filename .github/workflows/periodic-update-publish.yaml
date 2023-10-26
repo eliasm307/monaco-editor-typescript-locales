@@ -27,3 +27,4 @@ jobs:
         run: yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          CI_COMMIT_AUTHOR_NAME: ${{ github.actor }}
