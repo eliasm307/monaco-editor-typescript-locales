@@ -1282,9 +1282,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eliasm307/config@npm:^0.43.0":
-  version: 0.43.0
-  resolution: "@eliasm307/config@npm:0.43.0"
+"@eliasm307/config@npm:^0.44.0":
+  version: 0.44.0
+  resolution: "@eliasm307/config@npm:0.44.0"
   dependencies:
     eslint-config-airbnb: "npm:^19.0.4"
     eslint-config-airbnb-base: "npm:^15.0.0"
@@ -1303,7 +1303,7 @@ __metadata:
     "@typescript-eslint/parser": ">=6"
     eslint: ">=8"
     typescript: ">=5"
-  checksum: add0f12d13352c9a0fd31a1e1cdb9d7ef497734a5cca82af58766551ece0afed94a751d5d5c898bb9c614a5a1d06eb0b056653cb98adbca9026150c844b91390
+  checksum: 4a27e6376a14ccf463bc96877889d016b0fc3b2f607d3267d844ca00f3ba32361a6c1cf15c3e74dcd35adcb5dc15939f09943fbc1d8932b6b21489f8c9eefc1b
   languageName: node
   linkType: hard
 
@@ -1799,10 +1799,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^18.18.6":
-  version: 18.18.6
-  resolution: "@types/node@npm:18.18.6"
-  checksum: 50312053b0906058aa026e1c85c9125b4f0e8d6ae5e3699fb5bc8e0d5b9d1c2b12303902b2b91477c389f15ad40235d240b882819dd93a49bd6b46983f63be1c
+"@types/node@npm:^18.18.7":
+  version: 18.18.7
+  resolution: "@types/node@npm:18.18.7"
+  dependencies:
+    undici-types: "npm:~5.26.4"
+  checksum: f1ab9c8d318ad9b05f83664bd8a209b9a6410052b4e7124469771ee681ab080f9e65ac3ed3db8a3403976c1ee2941da1eef8008f42a7a3e2e084dc556d5494b5
   languageName: node
   linkType: hard
 
@@ -1840,14 +1842,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^18.2.32":
-  version: 18.2.32
-  resolution: "@types/react@npm:18.2.32"
+"@types/react@npm:^18.2.33":
+  version: 18.2.33
+  resolution: "@types/react@npm:18.2.33"
   dependencies:
     "@types/prop-types": "npm:*"
     "@types/scheduler": "npm:*"
     csstype: "npm:^3.0.2"
-  checksum: 648662cd852107d7933eee072fa5826069aca1ce15602db8573393ec694780de035cfac4d76f239762e2453b53a4aa8767ae057789661ccfee4d1311040953b9
+  checksum: d3392785660d78121541403a5d1da57dc79e8ce402769251a626aa06a6886a6aaead868a01ee473661380ddd4ac79743de78853d69f652544da191d435f78afb
   languageName: node
   linkType: hard
 
@@ -5620,9 +5622,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
-    "@eliasm307/config": "npm:^0.43.0"
-    "@types/node": "npm:^18.18.6"
-    "@types/react": "npm:^18.2.32"
+    "@eliasm307/config": "npm:^0.44.0"
+    "@types/node": "npm:^18.18.7"
+    "@types/react": "npm:^18.2.33"
     "@types/react-dom": "npm:^18.2.14"
     "@typescript-eslint/eslint-plugin": "npm:^6.9.0"
     "@typescript-eslint/parser": "npm:^6.9.0"
@@ -6291,6 +6293,13 @@ __metadata:
     has-symbols: "npm:^1.0.3"
     which-boxed-primitive: "npm:^1.0.2"
   checksum: 81ca2e81134167cc8f75fa79fbcc8a94379d6c61de67090986a2273850989dd3bae8440c163121b77434b68263e34787a675cbdcb34bb2f764c6b9c843a11b66
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~5.26.4":
+  version: 5.26.5
+  resolution: "undici-types@npm:5.26.5"
+  checksum: bb673d7876c2d411b6eb6c560e0c571eef4a01c1c19925175d16e3a30c4c428181fb8d7ae802a261f283e4166a0ac435e2f505743aa9e45d893f9a3df017b501
   languageName: node
   linkType: hard
 
