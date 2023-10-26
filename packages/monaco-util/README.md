@@ -76,6 +76,31 @@ tsDefaults.setCompilerOptions({
 });
 ```
 
+## Supported Locales
+
+<!-- LOCALES_METADATA_START -->
+
+|     | Code  | Description          |
+| --- | ----- | -------------------- |
+| 1   | cs    | Czech                |
+| 2   | de    | German               |
+| 3   | en    | English              |
+| 4   | es    | Spanish              |
+| 5   | fr    | French               |
+| 6   | it    | Italian              |
+| 7   | ja    | Japanese             |
+| 8   | ko    | Korean               |
+| 9   | pl    | Polish               |
+| 10  | pt-br | Brazilian Portuguese |
+| 11  | ru    | Russian              |
+| 12  | tr    | Turkish              |
+| 13  | zh-cn | Chinese (China)      |
+| 14  | zh-tw | Chinese (Taiwan)     |
+
+Generated from TypeScript version **5.2.2**
+
+<!-- LOCALES_METADATA_END -->
+
 ## Notes
 
 - Since languages can be set independently for JS and TS, you will need to set the same language for both if you want them to match.

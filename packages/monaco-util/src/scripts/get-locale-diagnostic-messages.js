@@ -13,6 +13,8 @@ const typescriptVersion = require("typescript/package.json").version;
 
 /** @typedef {Map<string, DiagnosticDetails>} InputDiagnosticMessageTable */
 
+/** @typedef {{generatedFromTypescriptVersion: string, availableLocales: string[]}} Metadata */
+
 const TS_DIAGNOSTIC_MESSAGES_SOURCE_FILE_URL =
   "https://raw.githubusercontent.com/microsoft/TypeScript/main/src/compiler/diagnosticMessages.json";
 const LOCALES_DIR = path.join(__dirname, "../../locales");
@@ -22,12 +24,17 @@ const TYPESCRIPT_NODE_MODULES_LIB_DIR = path.join(
 );
 const DIAGNOSTIC_MESSAGES_FILE_NAME_WITH_EXT = "diagnosticMessages.generated.json";
 const LOCALES_METADATA_FILE_PATH = path.join(LOCALES_DIR, "metadata.json");
+const README_FILE_PATH = path.join(__dirname, "../../README.md");
+const README_METADATA_START = "<!-- LOCALES_METADATA_START -->";
+const README_METADATA_END = "<!-- LOCALES_METADATA_END -->";
 
 async function main() {
   // English messages are distributed in the typescript source code, not as a standalone json file
   // so we need to generate our own
-  await generateEnglishDiagnosticMessages();
-  let availableLocales = ["en"];
+  await createEnglishDiagnosticMessagesFile();
+
+  // list of locales that have diagnostic messages
+  const availableLocales = ["en"];
 
   // Non english locale messages are included in the typescript distribution in node_modules, so copy them to our folder
   const localeDiagnosticMessagesFilePaths = getLocaleDiagnosticMessagesFilePaths();
@@ -37,7 +44,18 @@ async function main() {
     availableLocales.push(locale);
   }
 
-  createMetadataFile(availableLocales);
+  availableLocales.sort();
+
+  /** @type {Metadata} */
+  const metaData = {
+    // NOTE: the version is accurate for non-english locales from our node_modules,
+    // however english messages are fetched from latest source code, so assume they are compatible with atleast this version
+    generatedFromTypescriptVersion: typescriptVersion,
+    availableLocales,
+  };
+
+  createMetadataFile(metaData);
+  await updateReadmeWithMetadata(metaData);
 }
 
 main().then(() => console.log("DONE"));
@@ -62,22 +80,50 @@ function copyDiagnosticMessagesFromPath({ locale, diagnosticMessagesFilePath }) 
 }
 
 /**
- * @param {string[]} availableLocales - list of locales that have diagnostic messages
+ * @param {Metadata} metaData
  */
-function createMetadataFile(availableLocales) {
+function createMetadataFile(metaData) {
   ensureFileExistsAndWrite({
     filePath: LOCALES_METADATA_FILE_PATH,
-    // NOTE: the version is accurate for non-english locales from our node_modules,
-    // however english messages are fetched from latest source code, so assume they are compatible with atleast this version
-    content: JSON.stringify(
-      { generatedFromTypescriptVersion: typescriptVersion, availableLocales },
-      null,
-      2,
-    ),
+    content: JSON.stringify(metaData, null, 2),
   });
+  console.log(`Saved metadata to "${LOCALES_METADATA_FILE_PATH}"`);
 }
 
-async function generateEnglishDiagnosticMessages() {
+/**
+ * @param {Metadata} metaData
+ */
+async function updateReadmeWithMetadata(metaData) {
+  const getLocaleDisplayName = new Intl.DisplayNames(["en"], { type: "language" });
+  const localeTableRows = metaData.availableLocales
+    .map((locale, i) => `| ${i + 1} | ${locale} | ${getLocaleDisplayName.of(locale)} |`)
+    .join("\n");
+
+  const localesSectionText = [
+    "",
+    "| | Code | Description |",
+    "| -- | ------ | ------------ |",
+    localeTableRows,
+    "",
+    "",
+    `Generated from TypeScript version **${metaData.generatedFromTypescriptVersion}**`,
+    "",
+  ].join("\n");
+
+  const readmeContent = fs.readFileSync(README_FILE_PATH, "utf-8");
+  const startIdx = readmeContent.indexOf(README_METADATA_START) + README_METADATA_START.length;
+  const endIdx = readmeContent.indexOf(README_METADATA_END);
+  let newReadmeContent =
+    readmeContent.slice(0, startIdx) + localesSectionText + readmeContent.slice(endIdx);
+
+  const prettier = require("prettier");
+  newReadmeContent = await prettier.format(newReadmeContent, { filepath: README_FILE_PATH });
+
+  fs.writeFileSync(README_FILE_PATH, newReadmeContent);
+  console.log(`Updated README with metadata`);
+}
+
+async function createEnglishDiagnosticMessagesFile() {
   // english messages are distributed in the typescript source code, not as a standalone json file
   // so we need to fetch the source and generate our own json messages
   // NOTE: doing it like this to avoid cloning, installing, and building the entire TS repo just for one file

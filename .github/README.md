@@ -76,10 +76,34 @@ tsDefaults.setCompilerOptions({
 });
 ```
 
+## Supported Locales
+
+<!-- LOCALES_METADATA_START -->
+
+|     | Code  | Description          |
+| --- | ----- | -------------------- |
+| 1   | cs    | Czech                |
+| 2   | de    | German               |
+| 3   | en    | English              |
+| 4   | es    | Spanish              |
+| 5   | fr    | French               |
+| 6   | it    | Italian              |
+| 7   | ja    | Japanese             |
+| 8   | ko    | Korean               |
+| 9   | pl    | Polish               |
+| 10  | pt-br | Brazilian Portuguese |
+| 11  | ru    | Russian              |
+| 12  | tr    | Turkish              |
+| 13  | zh-cn | Chinese (China)      |
+| 14  | zh-tw | Chinese (Taiwan)     |
+
+Generated from TypeScript version **5.2.2**
+
+<!-- LOCALES_METADATA_END -->
+
 ## Notes
 
 - Since languages can be set independently for JS and TS, you will need to set the same language for both if you want them to match.
 - This assumes Typescript diagnostic messages content does not change across versions after being introduced into the TS compiler, which means this package just needs to be updated when new versions of Typescript are released and all previous versions are supported ie the messages are backward compatible.
 - This is a stop gap solution until the Monaco team implements a native Typescript worker localisation solution. The assumption of this package is this future functionality will hook into the language compiler options `locale` option, and so when that happens it should be a simple case of removing this package and the `register` calls to migrate to the official solution.
-- This only translates Typescript worker diagnostic messages, not the Monaco editor UI itself or messages from other languages or sources (e.g. linters or parsers).
-- Not all Monaco locales might be supported by Typescript and vice versa, so for some languages you might see a mix of translated and untranslated text even when using this package and setting the Monaco locale.
+- This only translates Typescript worker diagnostic messages, not the Monaco editor UI itself or messages from other languages or sources (e.g. linters or pars
