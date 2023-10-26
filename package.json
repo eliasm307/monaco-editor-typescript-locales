@@ -7,7 +7,8 @@
     "upgrade-latest": "yarn upgrade-interactive --latest",
     "lint": "eslint --report-unused-disable-directives --ignore-path .gitignore --quiet --ext .jsx,.js,.ts,.tsx --cache --fix .",
     "check-types": "tsc --noEmit",
-    "check": "concurrently --timings --prefix-colors auto --kill-others-on-fail \"yarn check-types\" \"yarn lint\""
+    "check": "concurrently --timings --prefix-colors auto --kill-others-on-fail \"yarn check-types\" \"yarn lint\"",
+    "ci:publish": "yarn --cwd packages/monaco-util run publish:minor"
   },
   "resolutions": {
     "eslint-plugin-react-hooks": "^4.6.0"
