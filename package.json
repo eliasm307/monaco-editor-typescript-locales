@@ -13,7 +13,7 @@
     "eslint-plugin-react-hooks": "^4.6.0"
   },
   "resolutionsNotes": {
-    "eslint-plugin-react-hooks": "To avoid issues with eslint not finding the right version as next js configs also define this with different versions sometimes"
+    "eslint-plugin-react-hooks": "Resolving to single version for the repo to avoid issues with eslint not finding the right version as next js configs also define this with different versions sometimes"
   },
   "devDependencies": {
     "@eliasm307/config": "^0.41.0",
