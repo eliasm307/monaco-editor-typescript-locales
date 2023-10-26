@@ -1282,9 +1282,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eliasm307/config@npm:^0.44.0":
-  version: 0.44.0
-  resolution: "@eliasm307/config@npm:0.44.0"
+"@eliasm307/config@npm:^0.44.1":
+  version: 0.44.1
+  resolution: "@eliasm307/config@npm:0.44.1"
   dependencies:
     eslint-config-airbnb: "npm:^19.0.4"
     eslint-config-airbnb-base: "npm:^15.0.0"
@@ -1303,7 +1303,7 @@ __metadata:
     "@typescript-eslint/parser": ">=6"
     eslint: ">=8"
     typescript: ">=5"
-  checksum: 4a27e6376a14ccf463bc96877889d016b0fc3b2f607d3267d844ca00f3ba32361a6c1cf15c3e74dcd35adcb5dc15939f09943fbc1d8932b6b21489f8c9eefc1b
+  checksum: 18b300fbd5614d0b95be8098d5417086f3d1d6e54f166ed04049822011c5275982e62e3d3a96303ea52c1518d7faff070b211dafd53d7bd80a74ffa6c37aa3a7
   languageName: node
   linkType: hard
 
@@ -5622,7 +5622,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "root-workspace-0b6124@workspace:."
   dependencies:
-    "@eliasm307/config": "npm:^0.44.0"
+    "@eliasm307/config": "npm:^0.44.1"
     "@types/node": "npm:^18.18.7"
     "@types/react": "npm:^18.2.33"
     "@types/react-dom": "npm:^18.2.14"

@@ -4,7 +4,6 @@
   ],
   "scripts": {
     "upgrade": "yarn upgrade-interactive",
-    "upgrade-latest": "yarn upgrade-interactive --latest",
     "lint": "eslint --report-unused-disable-directives --ignore-path .gitignore --quiet --ext .jsx,.js,.ts,.tsx --cache --fix .",
     "check-types": "tsc --noEmit",
     "check": "concurrently --timings --prefix-colors auto --kill-others-on-fail \"yarn check-types\" \"yarn lint\"",
@@ -17,7 +16,7 @@
     "eslint-plugin-react-hooks": "Resolving to single version for the repo to avoid issues with eslint not finding the right version as next js configs also define this with different versions sometimes"
   },
   "devDependencies": {
-    "@eliasm307/config": "^0.44.0",
+    "@eliasm307/config": "^0.44.1",
     "@types/node": "^18.18.7",
     "@types/react": "^18.2.33",
     "@types/react-dom": "^18.2.14",
