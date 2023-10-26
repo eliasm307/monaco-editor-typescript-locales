@@ -2,11 +2,12 @@ name: Periodic update and publish
 
 on:
   schedule:
-    - cron: "0 10 * * *" # Every day at 10:00 UTC
+    # Every day at 10:00, 17:00, 23:00 UTC
+    - cron: "0 10,17,23 * * *"
 
 jobs:
-  run-linters:
-    name: Run linters
+  update-and-deploy:
+    name: Update and deploy
     runs-on: ubuntu-latest
 
     steps:
@@ -20,9 +21,9 @@ jobs:
           registry-url: "https://registry.npmjs.org"
 
       - name: Install dependencies
-        run: yarn install --immutable --immutable-cache --check-cache
+        run: yarn install
 
       - name: Update and publish
-        run: yarn cwd --packages/monaco-util run publish:minor
+        run: yarn cwd -- packages/monaco-util run publish:minor
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
