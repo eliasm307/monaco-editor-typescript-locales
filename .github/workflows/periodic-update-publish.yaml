@@ -28,3 +28,4 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           CI_COMMIT_AUTHOR_NAME: ${{ github.actor }}
+          CI_COMMIT_AUTHOR_EMAIL: $CI_COMMIT_AUTHOR_EMAIL
