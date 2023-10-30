@@ -1,5 +1,6 @@
 /* eslint-env node */
 /* eslint-disable no-console */
+// @ts-check
 
 const path = require("node:path");
 const fs = require("node:fs");
@@ -12,8 +13,6 @@ const typescriptVersion = require("typescript/package.json").version;
 
 /** @typedef {{generatedFromTypescriptVersion: string, availableLocales: string[]}} Metadata */
 
-const TS_DIAGNOSTIC_MESSAGES_SOURCE_FILE_URL =
-  "https://raw.githubusercontent.com/microsoft/TypeScript/main/src/compiler/diagnosticMessages.json";
 const LOCALES_DIR = path.join(__dirname, "../../locales");
 const TYPESCRIPT_NODE_MODULES_LIB_DIR = path.join(
   __dirname,
@@ -157,7 +156,14 @@ async function fetchAndGenerateEnglishDiagnosticsMessages() {
 }
 
 async function fetchDiagnosticMessagesSourceData() {
-  return fetch(TS_DIAGNOSTIC_MESSAGES_SOURCE_FILE_URL).then((res) => res.json());
+  return fetch(
+    "https://api.github.com/repos/microsoft/TypeScript/contents/src/compiler/diagnosticMessages.json",
+  )
+    .then((res) => res.json())
+    .then((data) => {
+      const content = Buffer.from(data.content, "base64").toString("utf-8");
+      return JSON.parse(content);
+    });
 }
 
 /**
