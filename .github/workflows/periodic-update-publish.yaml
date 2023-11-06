@@ -2,8 +2,8 @@ name: Periodic update and publish
 
 on:
   schedule:
-    # Every day at 00:00 UTC
-    - cron: "0 0 * * *"
+    # Every first day of the month at 00:00 UTC
+    - cron: "0 0 1 * *"
 
 jobs:
   update-and-deploy:
