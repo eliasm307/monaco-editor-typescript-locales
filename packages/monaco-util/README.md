@@ -97,7 +97,7 @@ tsDefaults.setCompilerOptions({
 | 13  | zh-cn | Chinese (China)      |
 | 14  | zh-tw | Chinese (Taiwan)     |
 
-Generated from TypeScript version **5.4.3**
+Generated from TypeScript version **5.4.5**
 
 <!-- LOCALES_METADATA_END -->
 
