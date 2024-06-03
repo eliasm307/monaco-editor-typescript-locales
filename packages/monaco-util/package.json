@@ -1,6 +1,6 @@
 {
   "name": "monaco-editor-typescript-locales",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "A utility to translate diagnostic messages from the Monaco Editor TypeScript worker into different locales",
   "author": "Elias Mangoro",
   "license": "MIT",
