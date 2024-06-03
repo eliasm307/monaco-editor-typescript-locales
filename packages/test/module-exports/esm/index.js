@@ -9,4 +9,4 @@ import assert from "node:assert";
 
 assert.strictEqual(typeof mod.register, "function", "ESM module exports register function");
 
-console.log("ESM import test passed!", mod);
+console.log("ESM import test passed:", mod);

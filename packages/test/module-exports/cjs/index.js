@@ -9,4 +9,4 @@ const mod = require("monaco-editor-typescript-locales");
 
 assert.strictEqual(typeof mod.register, "function", "CJS module exports register function");
 
-console.log("CJS import test passed!", mod);
+console.log("CJS import test passed:", mod);
