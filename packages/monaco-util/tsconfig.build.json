@@ -4,7 +4,8 @@
     "noEmit": false,
     "sourceMap": false,
     "declaration": true,
-    "removeComments": false
+    "removeComments": false,
+    "incremental": false
   },
   "include": ["src/index.ts"],
   "exclude": ["node_modules", "dist"]
