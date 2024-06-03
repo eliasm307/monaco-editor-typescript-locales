@@ -20,21 +20,29 @@
     "locales",
     "i18n"
   ],
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/esm/index.mjs",
+  "types": "dist/esm/index.d.ts",
   "exports": {
-    "import": "./dist/index.js",
-    "require": "./dist/index.cjs"
+    "types": "./dist/esm/index.d.ts",
+    "import": "./dist/esm/index.mjs",
+    "require": "./dist/cjs/index.cjs",
+    "node": "./dist/cjs/index.cjs",
+    "default": "./dist/cjs/index.cjs"
   },
-  "types": "dist/index.d.ts",
   "files": [
-    "dist/index.js",
-    "dist/index.cjs",
-    "dist/index.d.ts",
+    "dist/cjs/index.cjs",
+    "dist/cjs/index.d.ts",
+    "dist/esm/index.mjs",
+    "dist/esm/index.d.ts",
     "locales"
   ],
   "scripts": {
-    "build:code": "echo 'Building code...' && tsc -p ./tsconfig.build.json --module commonjs && mv ./dist/index.js ./dist/index.cjs && tsc -p ./tsconfig.build.json",
-    "build:locales": "echo 'Building locales...' && node ./src/scripts/get-locale-diagnostic-messages.js",
     "build": "npm run build:code && npm run build:locales",
+    "build:code": "echo 'Building code...' && npm run build:code:esm && npm run build:code:cjs",
+    "build:code:esm": "echo 'Building code (ESM)...' && tsc -p ./tsconfig.build.json --outDir ./dist/esm --module esnext && mv ./dist/esm/index.js ./dist/esm/index.mjs",
+    "build:code:cjs": "echo 'Building code (CommonJS)...' && tsc -p ./tsconfig.build.json --outDir ./dist/cjs --module commonjs && mv ./dist/cjs/index.js ./dist/cjs/index.cjs",
+    "build:locales": "echo 'Building locales...' && node ./src/scripts/get-locale-diagnostic-messages.js",
     "update:ts": "node ../../.yarn/releases/yarn-4.0.1.cjs up typescript",
     "lint": "npm run --prefix ../.. lint",
     "test:imports": "echo 'Testing module exports...' && npm run --prefix ../test/module-exports/cjs test && npm run --prefix ../test/module-exports/esm test",
