@@ -61,7 +61,7 @@
     "monaco-editor": "Minimum v0.22.0 because that is when the #onDidChangeMarkers method was introduced which this package relies on."
   },
   "devDependencies": {
-    "glob": "^10.3.10",
-    "monaco-editor": "^0.44.0"
+    "glob": "^10.4.1",
+    "monaco-editor": "^0.49.0"
   }
 }
