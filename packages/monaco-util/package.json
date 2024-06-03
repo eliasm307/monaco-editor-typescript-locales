@@ -4,6 +4,7 @@
   "description": "A utility to translate diagnostic messages from the Monaco Editor TypeScript worker into different locales",
   "author": "Elias Mangoro",
   "license": "MIT",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eliasm307/monaco-editor-typescript-locales.git"
@@ -36,7 +37,7 @@
     "build": "npm run build:code && npm run build:locales",
     "update:ts": "node ../../.yarn/releases/yarn-4.0.1.cjs up typescript",
     "lint": "npm run --prefix ../.. lint",
-    "test:imports": "echo 'Testing exports...' && node src/test/exports/index.cjs && node src/test/exports/index.mjs",
+    "test:imports": "echo 'Testing module exports...' && npm run --prefix ../test/module-exports/cjs test && npm run --prefix ../test/module-exports/esm test",
     "test": "echo 'Testing...' && npm run test:imports",
     "prepublish:base": "echo 'Making sure TypeScript is up to date...' && npm run update:ts && npm run lint && npm run build && npm run test",
     "publish:base": "node ../../node_modules/@eliasm307/config/dist/scripts/publish.js relativeGitPath=../.. relativeNpmPath=. commitChanges=true",
