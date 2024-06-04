@@ -7,7 +7,7 @@
     "lint": "eslint --report-unused-disable-directives --ignore-path .gitignore --quiet --ext .jsx,.js,.ts,.tsx --cache --fix .",
     "check-types": "tsc --noEmit",
     "check": "concurrently --timings --prefix-colors auto --kill-others-on-fail \"npm run check-types\" \"npm run lint\"",
-    "ci:publish": "npm run --prefix packages/monaco-util run publish:minor"
+    "ci:publish": "npm --prefix packages/monaco-util run publish:minor"
   },
   "resolutions": {
     "eslint-plugin-react-hooks": "^4.6.0"

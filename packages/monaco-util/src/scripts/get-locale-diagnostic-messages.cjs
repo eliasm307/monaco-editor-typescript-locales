@@ -13,7 +13,7 @@ const typescriptVersion = require("typescript/package.json").version;
 
 /** @typedef {{generatedFromTypescriptVersion: string, availableLocales: string[]}} Metadata */
 
-const LOCALES_DIR = path.join(__dirname, "../../locales");
+const LOCALES_DIR = path.join(__dirname, "../../dist/locales");
 const TYPESCRIPT_NODE_MODULES_LIB_DIR = path.join(
   __dirname,
   "../../../../node_modules/typescript/lib",

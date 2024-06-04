@@ -1,4 +1,4 @@
-import { register } from "monaco-editor-typescript-locales/src";
+import { register } from "monaco-editor-typescript-locales";
 import { useState, useRef, useEffect } from "react";
 import type { BoxProps } from "@chakra-ui/react";
 import { Box, Heading, VStack } from "@chakra-ui/react";
