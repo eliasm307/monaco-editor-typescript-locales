@@ -275,7 +275,7 @@ function createEnglishMessagePlaceholdersRegex({
       }
       visitedPlaceholderIndexes.add(placeholderIndex);
       // NOTE: we use named capture groups so we have a mapping from the regex matches to the placeholder index,
-        // sometimes a higher placeholder index can be used before a lower one
+      // sometimes a higher placeholder index can be used before a lower one
       // NOTE: named capture group id needs to be a valid JS identifier (so cant be directly the index)
       return `(?<_${placeholderIndex}>.+)`;
     },
@@ -325,6 +325,7 @@ async function getDiagnosticMessageTemplatesForLocale(
   }
 
   // fetch the message templates
+  // NOTE: path here is relative to the compiled output
   const rawLocaleDiagnosticMessagesMap: Record<string, string> = await import(
     `../locales/${locale}/diagnosticMessages.generated.json`
   ).then((m) => m.default);
