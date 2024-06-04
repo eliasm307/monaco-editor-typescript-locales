@@ -1,4 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
+import { TEST_SITE_PORT } from "./src/constants";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -29,4 +30,10 @@ export default defineConfig({
   /* Configure projects for major browsers */
   // we just need to test one browser, we are testing storybook functionality not its browser compatibility
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+
+  webServer: {
+    port: TEST_SITE_PORT,
+    reuseExistingServer: true,
+    command: "npm run dev",
+  },
 });
