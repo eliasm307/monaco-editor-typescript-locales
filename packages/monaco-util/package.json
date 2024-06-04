@@ -31,11 +31,7 @@
     "default": "./dist/cjs/index.cjs"
   },
   "files": [
-    "dist/cjs/index.cjs",
-    "dist/cjs/index.d.ts",
-    "dist/esm/index.mjs",
-    "dist/esm/index.d.ts",
-    "locales"
+    "dist"
   ],
   "scripts": {
     "build": "echo 'Building...' && concurrently --timings --prefix-colors auto --kill-others-on-fail \"npm:build:*\"",
