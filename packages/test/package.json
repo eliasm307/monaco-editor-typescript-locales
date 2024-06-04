@@ -7,9 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "npx playwright test",
-    "test:ui": "npx playwright test --ui",
-    "test:codegen": "npx playwright codegen http://localhost:3001/"
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:codegen": "playwright codegen http://localhost:3001/"
   },
   "dependencies": {
     "@packages/common": "link:../common",
