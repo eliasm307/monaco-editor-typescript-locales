@@ -1,14 +1,13 @@
 "use client";
 
-import {Center, Grid, HStack, Heading, Spinner, Text, Tooltip, VStack} from "@chakra-ui/react";
-import {loader} from "@monaco-editor/react";
-import {useCallback, useEffect, useRef, useState} from "react";
-import type {EditorPanelProps} from "@packages/common/src/components/EditorPanel";
+import { Center, Grid, HStack, Heading, Spinner, Text, Tooltip, VStack } from "@chakra-ui/react";
+import { loader } from "@monaco-editor/react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { EditorPanelProps } from "@packages/common/src/components/EditorPanel";
 import EditorPanel from "@packages/common/src/components/EditorPanel";
 import LocaleSelect from "@packages/common/src/components/LocaleSelect";
-// eslint-disable-next-line import/no-relative-packages
 import localesMetadata from "../../../monaco-util/dist/locales/metadata.json";
-import {Colours} from "./constants";
+import { Colours } from "./constants";
 
 // todo update site icons
 
@@ -61,7 +60,7 @@ export default function Home() {
   );
 }
 
-function Header({locale, setLocale}: {locale: string; setLocale: (locale: string) => void}) {
+function Header({ locale, setLocale }: { locale: string; setLocale: (locale: string) => void }) {
   // todo add light/dark theme switcher
 
   const reloadOnChangeRef = useRef(getUrlParam("reloadOnChange") === "true");
@@ -138,13 +137,13 @@ fnc() {
   // which doesn't get translated
 `;
 
-function Editors({locale}: {locale: string}) {
+function Editors({ locale }: { locale: string }) {
   const [state, setState] = useState<"idle" | "loading">("idle");
 
   // load monaco using initial locale
   useEffect(() => {
     loader.config({
-      "vs/nls": {availableLanguages: {"*": locale === "en" ? undefined : locale}},
+      "vs/nls": { availableLanguages: { "*": locale === "en" ? undefined : locale } },
     });
 
     const existingInstance = loader.__getMonacoInstance();
@@ -183,9 +182,9 @@ function Editors({locale}: {locale: string}) {
       className='editors-container'
       position='relative'
       zIndex={2}
-      height={{base: "auto", [BREAK_POINT]: "100%"}}
-      templateColumns={{base: "1fr", [BREAK_POINT]: "1fr 1fr"}}
-      templateRows={{base: "1fr", [BREAK_POINT]: "1fr 1fr"}}
+      height={{ base: "auto", [BREAK_POINT]: "100%" }}
+      templateColumns={{ base: "1fr", [BREAK_POINT]: "1fr 1fr" }}
+      templateRows={{ base: "1fr", [BREAK_POINT]: "1fr 1fr" }}
       transition='none !important'
       width='100%'
       maxWidth='100%'
@@ -195,19 +194,19 @@ function Editors({locale}: {locale: string}) {
     >
       <EditorPanel
         {...baseEditorPanelProps}
-        editor={{languageId: "javascript", locale, defaultValue: JS_CODE_WITH_ISSUES}}
+        editor={{ languageId: "javascript", locale, defaultValue: JS_CODE_WITH_ISSUES }}
       />
       <EditorPanel
         {...baseEditorPanelProps}
-        editor={{languageId: "javascript", locale, defaultValue: JS_CODE_WITH_ISSUES}}
+        editor={{ languageId: "javascript", locale, defaultValue: JS_CODE_WITH_ISSUES }}
       />
       <EditorPanel
         {...baseEditorPanelProps}
-        editor={{languageId: "typescript", locale, defaultValue: JS_CODE_WITH_ISSUES}}
+        editor={{ languageId: "typescript", locale, defaultValue: JS_CODE_WITH_ISSUES }}
       />
       <EditorPanel
         {...baseEditorPanelProps}
-        editor={{languageId: "typescript", locale, defaultValue: JS_CODE_WITH_ISSUES}}
+        editor={{ languageId: "typescript", locale, defaultValue: JS_CODE_WITH_ISSUES }}
       />
     </Grid>
   );
