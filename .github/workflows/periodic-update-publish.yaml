@@ -1,6 +1,9 @@
 name: Periodic update and publish
 
 on:
+  # see https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/manually-running-a-workflow
+  workflow_dispatch:
+
   schedule:
     # Every first day of the month at 00:00 UTC
     - cron: "0 0 1 * *"
