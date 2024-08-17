@@ -58,8 +58,6 @@ export default class MultipleEditorsPageObject {
 
   async openPageUsingConfig(config: MultipleEditorsPageConfig) {
     const url = createTestPageUrlUsingConfig({ path: MULTIPLE_EDITORS_PAGE_PATH, config });
-    // eslint-disable-next-line no-console
-    console.log(`Opening page: ${url}`);
     await this.page.goto(url);
 
     // wait until editor is ready ie we expect markers to exist for any test case
