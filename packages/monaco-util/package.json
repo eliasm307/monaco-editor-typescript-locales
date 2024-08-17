@@ -42,7 +42,7 @@
     "test:imports": "echo 'Testing module exports...' && concurrently --timings --prefix-colors auto --kill-others-on-fail \"npm:test:imports:*\"",
     "test:imports:cjs": "npm run --prefix ../test/module-exports/cjs test",
     "test:imports:esm": "npm run --prefix ../test/module-exports/esm test",
-    "test:integration": "npx playwright install && npm run --prefix ../test test",
+    "test:integration": "npm run --prefix ../test test",
     "update:ts": "echo 'Making sure TypeScript is up to date...' && node ../../.yarn/releases/yarn-4.0.1.cjs up typescript",
     "lint": "npm run --prefix ../.. lint",
     "prepublish:base": "npm run lint && npm run update:ts && npm run build && npm run test",
