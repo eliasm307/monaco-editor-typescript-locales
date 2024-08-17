@@ -1,4 +1,4 @@
-const baseConfig = require("@eliasm307/config/eslint")({ withReact: true, withPrettier: true });
+const baseConfig = require("@eliasm307/config/eslint")({withReact: true, withPrettier: true});
 
 module.exports = {
   ...baseConfig,

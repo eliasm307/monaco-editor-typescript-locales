@@ -1,4 +1,4 @@
-import { assertTestSiteIsRunning } from "./src/utils";
+import {assertTestSiteIsRunning} from "./src/utils";
 
 export default async function globalSetup() {
   await assertTestSiteIsRunning();

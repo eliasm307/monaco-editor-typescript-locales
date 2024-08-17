@@ -8,7 +8,7 @@ The locale of the [Monaco editor](https://github.com/microsoft/monaco-editor) ca
 
 ```js
 // set locale to German
-require.config({ "vs/nls": { availableLanguages: { "*": "de" } } });
+require.config({"vs/nls": {availableLanguages: {"*": "de"}}});
 ```
 
 However, currently this only translates the Monaco editor UI itself and not the diagnostic messages from the Typescript worker that provides language functionality to JavaScript and TypeScript in the editor.

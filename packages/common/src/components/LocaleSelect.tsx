@@ -1,6 +1,6 @@
-import { useRef } from "react";
 import type { SelectProps } from "@chakra-ui/react";
 import { Select } from "@chakra-ui/react";
+import { useRef } from "react";
 // eslint-disable-next-line import/no-relative-packages
 import localesMetadata from "../../../monaco-util/dist/locales/metadata.json";
 

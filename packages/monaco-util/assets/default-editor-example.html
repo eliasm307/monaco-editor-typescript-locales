@@ -14,9 +14,17 @@
     <script src="https://cdn.jsdelivr.net/npm/monaco-editor/min/vs/loader.min.js"></script>
     <script>
       // require is provided by loader.min.js.
-      require.config({ paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor/min/vs" } });
+      require.config({
+        paths: {
+          vs: "https://cdn.jsdelivr.net/npm/monaco-editor/min/vs",
+        },
+      });
       // set the locale to German
-      require.config({ "vs/nls": { availableLanguages: { "*": "de" } } });
+      require.config({
+        "vs/nls": {
+          availableLanguages: { "*": "de" },
+        },
+      });
 
       require(["vs/editor/editor.main"], () => {
         const defaults = monaco.languages.typescript.javascriptDefaults;

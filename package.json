@@ -5,8 +5,9 @@
   "scripts": {
     "upgrade": "node ./.yarn/releases/yarn-4.0.1.cjs upgrade-interactive",
     "lint": "eslint --report-unused-disable-directives --ignore-path .gitignore --quiet --ext .jsx,.js,.ts,.tsx --cache --fix .",
+    "format": "prettier --write .",
     "check-types": "tsc --noEmit",
-    "check": "concurrently --timings --prefix-colors auto --kill-others-on-fail \"npm run check-types\" \"npm run lint\"",
+    "check": "concurrently --timings --prefix-colors auto --kill-others-on-fail \"npm run check-types\" \"npm run lint\" \"npm run format\"",
     "ci:publish": "npm --prefix packages/monaco-util run publish:minor"
   },
   "resolutions": {

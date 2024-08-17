@@ -1,4 +1,4 @@
-import type { MonacoModule } from "./types";
+import type {MonacoModule} from "./types";
 
 export function getLanguageIdDefaults({
   monaco,

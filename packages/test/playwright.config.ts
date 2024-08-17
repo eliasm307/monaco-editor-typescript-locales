@@ -1,5 +1,5 @@
-import { defineConfig, devices } from "@playwright/test";
-import { TEST_SITE_PORT } from "./src/constants";
+import {defineConfig, devices} from "@playwright/test";
+import {TEST_SITE_PORT} from "./src/constants";
 
 const isCI = !!process.env.CI;
 
@@ -20,7 +20,7 @@ export default defineConfig({
   /* Retry on CI only */
   retries: isCI ? 2 : 0,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: [["html", { open: "never" }]],
+  reporter: [["html", {open: "never"}]],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
@@ -32,7 +32,7 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   // we just need to test one browser, we are testing storybook functionality not its browser compatibility
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [{name: "chromium", use: {...devices["Desktop Chrome"]}}],
 
   webServer: {
     port: TEST_SITE_PORT,

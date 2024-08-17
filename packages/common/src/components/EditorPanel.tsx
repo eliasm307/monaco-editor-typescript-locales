@@ -1,11 +1,11 @@
-import { register } from "monaco-editor-typescript-locales";
-import { useState, useRef, useEffect } from "react";
-import type { BoxProps } from "@chakra-ui/react";
-import { Box, Heading, VStack } from "@chakra-ui/react";
-import { Editor } from "@monaco-editor/react";
-import type { editor } from "monaco-editor";
-import type { LanguageId, MonacoModule } from "../types";
-import { getLanguageIdDefaults } from "../utils";
+import {register} from "monaco-editor-typescript-locales";
+import {useState, useRef, useEffect} from "react";
+import type {BoxProps} from "@chakra-ui/react";
+import {Box, Heading, VStack} from "@chakra-ui/react";
+import {Editor} from "@monaco-editor/react";
+import type {editor} from "monaco-editor";
+import type {LanguageId, MonacoModule} from "../types";
+import {getLanguageIdDefaults} from "../utils";
 
 export type EditorPanelProps = BoxProps & {
   editor: {
@@ -19,7 +19,7 @@ export type EditorPanelProps = BoxProps & {
 };
 
 export default function EditorPanel({
-  editor: { id, languageId, locale, defaultValue, onMonacoLoaded, onEditorMounted },
+  editor: {id, languageId, locale, defaultValue, onMonacoLoaded, onEditorMounted},
   ...boxProps
 }: EditorPanelProps) {
   const [monaco, setMonaco] = useState<typeof import("monaco-editor")>();
@@ -27,7 +27,7 @@ export default function EditorPanel({
 
   useEffect(() => {
     if (!monaco) return;
-    const languageDefaults = getLanguageIdDefaults({ monaco, languageId });
+    const languageDefaults = getLanguageIdDefaults({monaco, languageId});
 
     // update compiler options `locale` and keep other existing options
     languageDefaults.setCompilerOptions({
@@ -63,7 +63,7 @@ export default function EditorPanel({
           defaultPath={id}
           options={{
             automaticLayout: true,
-            minimap: { enabled: false },
+            minimap: {enabled: false},
           }}
           beforeMount={(monacoInstanceInstance) => {
             register(monacoInstanceInstance);

@@ -1,4 +1,4 @@
-import type { editor, languages, MarkerTag, Uri } from "monaco-editor";
+import type {editor, languages, MarkerTag, Uri} from "monaco-editor";
 
 const TYPESCRIPT_WORKER_LANGUAGE_IDS = ["typescript", "javascript"] as const;
 
@@ -40,21 +40,21 @@ export function register(monaco: MonacoModule): void {
 
   // setup JS/TS message translation on locale change
   TYPESCRIPT_WORKER_LANGUAGE_IDS.forEach((languageId) => {
-    const defaults = getDefaultsForLanguageId({ monaco, languageId });
+    const defaults = getDefaultsForLanguageId({monaco, languageId});
     defaults.onDidChange(() => {
       // NOTE: we derive this from compiler options so we use the same locale as the compiler,
       // if we tracked this separately we could end up using a different locale if Monaco adds support for this property in the future
       // however it means we are limited to having locals per language and not per model (but tbc if there are any use cases for this)
       const newLocale = defaults.getCompilerOptions().locale || "en";
-      onLanguageLocaleChange({ monaco, languageId, newLocale });
+      onLanguageLocaleChange({monaco, languageId, newLocale});
     });
   });
 
   // setup JS/TS message translation on content change
   // NOTE: assuming monaco fires this with debouncing etc so its performant to handle this directly without further buffering etc
   monaco.editor.onDidChangeMarkers((affectedUris) => {
-    void translateMarkersForLanguage({ monaco, languageId: "javascript", affectedUris });
-    void translateMarkersForLanguage({ monaco, languageId: "typescript", affectedUris });
+    void translateMarkersForLanguage({monaco, languageId: "javascript", affectedUris});
+    void translateMarkersForLanguage({monaco, languageId: "typescript", affectedUris});
   });
 }
 
@@ -95,7 +95,7 @@ function onLanguageLocaleChange({
     return; // no change
   }
   lastSetLanguageLocales[languageId] = newLocale;
-  void translateMarkersForLanguage({ monaco, languageId });
+  void translateMarkersForLanguage({monaco, languageId});
 }
 
 async function translateMarkersForLanguage({
@@ -125,7 +125,7 @@ async function translateMarkersForLanguage({
   try {
     // NOTE: assumes the JS/TS messages will always have the owner for their markers set as the language ID
     // NOTE: we assume the current markers are in english and previous custom markers have been removed when this is called
-    const markers = monaco.editor.getModelMarkers({ owner: languageId });
+    const markers = monaco.editor.getModelMarkers({owner: languageId});
     if (!markers.length) {
       return; // no markers to translate or we already translated them
     }
@@ -135,7 +135,7 @@ async function translateMarkersForLanguage({
       return; // all markers have already been translated
     }
 
-    const translatedMarkers = await translateMarkers({ markers, targetLocale });
+    const translatedMarkers = await translateMarkers({markers, targetLocale});
     translatedMarkers
       // group markers by resource
       .reduce((resourceMarkersMap, marker) => {
@@ -315,7 +315,7 @@ function escapeRegExp(string: string): string {
     : string || "";
 }
 
-const LOCALE_TO_MESSAGE_TEMPLATES_MAP_CACHE: { [key in string]?: MessageTemplatesMap } = {};
+const LOCALE_TO_MESSAGE_TEMPLATES_MAP_CACHE: {[key in string]?: MessageTemplatesMap} = {};
 async function getDiagnosticMessageTemplatesForLocale(
   locale: string,
 ): Promise<MessageTemplatesMap> {
