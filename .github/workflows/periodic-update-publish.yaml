@@ -31,9 +31,12 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
+      # publish can only add a commit if git user infos are set
+      - run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+
       - name: Update and publish
         run: yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          CI_COMMIT_AUTHOR_NAME: CI
-          CI_COMMIT_AUTHOR_EMAIL: 13420359+eliasm307@users.noreply.github.com
