@@ -16,18 +16,18 @@
     "eslint-plugin-react-hooks": "Resolving to single version for the repo to avoid issues with eslint not finding the right version as next js configs also define this with different versions sometimes"
   },
   "devDependencies": {
-    "@eliasm307/config": "^0.45.0",
-    "@types/node": "^20.14.0",
+    "@eliasm307/config": "^0.51.1",
+    "@types/node": "^20.15.0",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
-    "@typescript-eslint/eslint-plugin": "^7.12.0",
-    "@typescript-eslint/parser": "^7.12.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-config-next": "13.5.6",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-react-hooks": "^4.6.2",
-    "prettier": "^3.3.0",
+    "prettier": "^3.3.3",
     "typescript": "^5.5.4"
   },
   "packageManager": "yarn@4.0.1"
