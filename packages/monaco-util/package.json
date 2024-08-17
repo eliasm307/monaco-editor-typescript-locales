@@ -44,8 +44,7 @@
     "test:imports:esm": "npm run --prefix ../test/module-exports/esm test",
     "test:integration": "npm run --prefix ../test test",
     "update:ts": "echo 'Making sure TypeScript is up to date...' && node ../../.yarn/releases/yarn-4.0.1.cjs up typescript",
-    "lint": "npm run --prefix ../.. lint",
-    "prepublish:base": "npm run lint && npm run update:ts && npm run build && npm run test",
+    "prepublish:base": "npm run --prefix ../.. check && npm run update:ts && npm run build && npm run test",
     "publish:base": "node ../../node_modules/@eliasm307/config/dist/scripts/publish.js relativeGitPath=../.. relativeNpmPath=. commitChanges=true",
     "publish:patch": "npm run publish:base -- level=patch",
     "publish:minor": "npm run publish:base -- level=minor",
@@ -58,7 +57,7 @@
     "monaco-editor": "Minimum v0.22.0 because that is when the #onDidChangeMarkers method was introduced which this package relies on."
   },
   "devDependencies": {
-    "glob": "^10.4.1",
-    "monaco-editor": "^0.49.0"
+    "glob": "^10.4.5",
+    "monaco-editor": "^0.50.0"
   }
 }

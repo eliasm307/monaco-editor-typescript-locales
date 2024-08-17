@@ -11,8 +11,8 @@
   "dependencies": {
     "@chakra-ui/next-js": "^2.2.0",
     "@chakra-ui/react": "^2.8.2",
-    "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
     "@monaco-editor/react": "^4.6.0",
     "@packages/common": "link:../common",
     "framer-motion": "^10.18.0",

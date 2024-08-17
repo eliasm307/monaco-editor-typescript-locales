@@ -1,10 +1,10 @@
 "use client";
 
-import { Grid, HStack, Text, VStack } from "@chakra-ui/react";
+import {Grid, HStack, Text, VStack} from "@chakra-ui/react";
 import EditorPanel from "@packages/common/src/components/EditorPanel";
-import { useEffect, useState } from "react";
-import type { Monaco } from "@monaco-editor/react";
-import type { editor } from "monaco-editor";
+import {useEffect, useState} from "react";
+import type {Monaco} from "@monaco-editor/react";
+import type {editor} from "monaco-editor";
 import LocaleSelector from "@packages/common/src/components/LocaleSelect";
 import {
   createIdForEditorIndex,
@@ -25,7 +25,7 @@ export default function Page() {
   useEffect(() => {
     if (!monaco) return;
 
-    logEvents({ type: "Monaco", instance: monaco.editor });
+    logEvents({type: "Monaco", instance: monaco.editor});
 
     monaco.editor.onDidChangeMarkers(() => {
       setCurrentMarkers(monaco.editor.getModelMarkers({}));
@@ -96,7 +96,7 @@ export default function Page() {
               );
 
               for (const languageId of uniqueLanguageIds) {
-                const defaults = getDefaultsForLanguageId({ monaco, languageId });
+                const defaults = getDefaultsForLanguageId({monaco, languageId});
                 defaults.setCompilerOptions({
                   ...defaults.getCompilerOptions(),
                   locale: newLocale,

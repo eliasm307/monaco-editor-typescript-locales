@@ -9,6 +9,7 @@ jobs:
   update-and-deploy:
     name: Update and deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 60
 
     steps:
       - name: Check out Git repository
@@ -22,6 +23,10 @@ jobs:
 
       - name: Install dependencies
         run: yarn install
+
+      # see https://playwright.dev/docs/ci-intro
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
 
       - name: Update and publish
         run: yarn run ci:publish

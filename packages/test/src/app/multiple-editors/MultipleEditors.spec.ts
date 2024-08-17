@@ -1,10 +1,8 @@
-import { test } from "@playwright/test";
+import {test} from "@playwright/test";
 import MultipleEditorsPageObject from "./MultipleEditorsPageObject";
 
 // also tests markers are not doubled up when there are multiple models
-test("it can translate multiple models of the same js language simultaneously", async ({
-  page,
-}) => {
+test("it can translate multiple models of the same js language simultaneously", async ({page}) => {
   const pageObject = new MultipleEditorsPageObject(page);
   await pageObject.openPageUsingConfig({
     locale: "fr",
@@ -38,7 +36,7 @@ test("it can translate multiple models of the same js language simultaneously", 
     },
   ]);
 
-  await editor0.actions.setCursorToPosition({ lineNumber: 1, column: 1 });
+  await editor0.actions.setCursorToPosition({lineNumber: 1, column: 1});
   await editor0.actions.typeValueAtCurrentCursorPosition("x");
   await pageObject.assert.actualMarkersMatch([
     {
@@ -56,7 +54,7 @@ test("it can translate multiple models of the same js language simultaneously", 
   ]);
 
   const editor1 = pageObject.editor1;
-  await editor1.actions.setCursorToPosition({ lineNumber: 1, column: 1 });
+  await editor1.actions.setCursorToPosition({lineNumber: 1, column: 1});
   await editor1.actions.typeValueAtCurrentCursorPosition("x");
   await pageObject.assert.actualMarkersMatch([
     {
@@ -114,7 +112,7 @@ test("test it can translate multiple models of different js languages simultaneo
     },
   ]);
 
-  await editor0.actions.setCursorToPosition({ lineNumber: 1, column: 1 });
+  await editor0.actions.setCursorToPosition({lineNumber: 1, column: 1});
   await editor0.actions.typeValueAtCurrentCursorPosition("x");
   await pageObject.assert.actualMarkersMatch([
     {
@@ -137,7 +135,7 @@ test("test it can translate multiple models of different js languages simultaneo
     },
   ]);
 
-  await editor1.actions.setCursorToPosition({ lineNumber: 1, column: 1 });
+  await editor1.actions.setCursorToPosition({lineNumber: 1, column: 1});
   await editor1.actions.typeValueAtCurrentCursorPosition("x");
   await pageObject.assert.actualMarkersMatch([
     {

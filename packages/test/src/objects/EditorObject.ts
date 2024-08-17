@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-shadow */
-import type { Page } from "@playwright/test";
-import type { MonacoModule } from "@packages/common/src/types";
-import type { editor, IPosition } from "monaco-editor";
-import { createIdForEditorIndex } from "../utils";
-import type { EditorId } from "../types";
+import type {Page} from "@playwright/test";
+import type {MonacoModule} from "@packages/common/src/types";
+import type {editor, IPosition} from "monaco-editor";
+import {createIdForEditorIndex} from "../utils";
+import type {EditorId} from "../types";
 
 type EditorMap = {
   // we will add these
@@ -27,7 +27,7 @@ class Actions {
 
   async setValue(value: string) {
     await this.object.page.evaluate(
-      ({ editorId, value }) => {
+      ({editorId, value}) => {
         window[editorId].setValue(value);
       },
       {
@@ -39,28 +39,28 @@ class Actions {
 
   async setCursorToPosition(position: IPosition) {
     await this.object.page.evaluate(
-      ({ editorId, position }) => {
+      ({editorId, position}) => {
         window[editorId].setPosition(position);
       },
-      { position, editorId: this.object.editorId },
+      {position, editorId: this.object.editorId},
     );
   }
 
   async typeValueAtCurrentCursorPosition(value: string) {
     await this.object.page.evaluate(
-      ({ editorId, value }) => {
-        window[editorId].trigger("keyboard", "type", { text: value });
+      ({editorId, value}) => {
+        window[editorId].trigger("keyboard", "type", {text: value});
       },
-      { value, editorId: this.object.editorId },
+      {value, editorId: this.object.editorId},
     );
   }
 
   async backspaceAtCurrentCursorPosition() {
     await this.object.page.evaluate(
-      ({ editorId }) => {
+      ({editorId}) => {
         window[editorId].trigger("keyboard", "deleteLeft", {});
       },
-      { editorId: this.object.editorId },
+      {editorId: this.object.editorId},
     );
   }
 }

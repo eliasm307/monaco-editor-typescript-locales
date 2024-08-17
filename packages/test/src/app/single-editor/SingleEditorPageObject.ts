@@ -1,9 +1,9 @@
-import type { Page } from "@playwright/test";
-import { expect } from "@playwright/test";
-import type { LanguageId } from "@packages/common/src/types";
-import { createTestPageUrlUsingConfig } from "../../utils";
-import type { TestMarkerData, BaseTestPageConfig } from "../../types";
+import type {LanguageId} from "@packages/common/src/types";
+import type {Page} from "@playwright/test";
+import {expect} from "@playwright/test";
 import EditorObject from "../../objects/EditorObject";
+import type {BaseTestPageConfig, TestMarkerData} from "../../types";
+import {createTestPageUrlUsingConfig} from "../../utils";
 
 class Assertions {
   constructor(private object: SingleEditorPageObject) {}
@@ -35,19 +35,17 @@ export default class SingleEditorPageObject {
   editor: EditorObject;
 
   constructor(public page: Page) {
-    this.editor = new EditorObject(page, { index: 0 });
+    this.editor = new EditorObject(page, {index: 0});
   }
 
   async openPageUsingConfig(config: SingleEditorPageConfig) {
-    const url = createTestPageUrlUsingConfig({ path: SINGLE_EDITOR_PAGE_PATH, config });
-    // eslint-disable-next-line no-console
-    console.log(`Opening page: ${url}`);
+    const url = createTestPageUrlUsingConfig({path: SINGLE_EDITOR_PAGE_PATH, config});
     await this.page.goto(url);
 
     // wait until editor is ready ie we expect markers to exist for any test case
     await expect(this.editorMarkersDataContainer, {
       message: "markers data container should be visible initially",
-    }).toBeVisible({ timeout: 10_000 });
+    }).toBeVisible({timeout: 10_000});
   }
 
   /**

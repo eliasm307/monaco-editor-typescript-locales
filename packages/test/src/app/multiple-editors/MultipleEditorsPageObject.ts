@@ -1,9 +1,9 @@
-import type { LanguageId } from "@packages/common/src/types";
-import type { Page } from "@playwright/test";
-import { expect } from "@playwright/test";
+import type {LanguageId} from "@packages/common/src/types";
+import type {Page} from "@playwright/test";
+import {expect} from "@playwright/test";
 import EditorObject from "../../objects/EditorObject";
-import { createTestPageUrlUsingConfig } from "../../utils";
-import type { BaseTestPageConfig, TestMarkerData } from "../../types";
+import {createTestPageUrlUsingConfig} from "../../utils";
+import type {BaseTestPageConfig, TestMarkerData} from "../../types";
 
 export const MULTIPLE_EDITORS_PAGE_PATH = "/multiple-editors";
 
@@ -38,8 +38,8 @@ export default class MultipleEditorsPageObject {
   assert = new Assertions(this);
 
   constructor(public page: Page) {
-    this.editor0 = new EditorObject(page, { index: 0 });
-    this.editor1 = new EditorObject(page, { index: 1 });
+    this.editor0 = new EditorObject(page, {index: 0});
+    this.editor1 = new EditorObject(page, {index: 1});
   }
 
   /**
@@ -57,14 +57,12 @@ export default class MultipleEditorsPageObject {
   }
 
   async openPageUsingConfig(config: MultipleEditorsPageConfig) {
-    const url = createTestPageUrlUsingConfig({ path: MULTIPLE_EDITORS_PAGE_PATH, config });
-    // eslint-disable-next-line no-console
-    console.log(`Opening page: ${url}`);
+    const url = createTestPageUrlUsingConfig({path: MULTIPLE_EDITORS_PAGE_PATH, config});
     await this.page.goto(url);
 
     // wait until editor is ready ie we expect markers to exist for any test case
     await expect(this.editorMarkersDataContainer, {
       message: "markers data container should be visible initially",
-    }).toBeVisible({ timeout: 10_000 });
+    }).toBeVisible({timeout: 10_000});
   }
 }

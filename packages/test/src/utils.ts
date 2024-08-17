@@ -1,7 +1,7 @@
-import type { LanguageId, MonacoModule } from "@packages/common/src/types";
-import type { editor, languages } from "monaco-editor";
-import { TEST_SITE_BASE_URL } from "./constants";
-import type { EditorId, TestMarkerData } from "./types";
+import type {LanguageId, MonacoModule} from "@packages/common/src/types";
+import type {editor, languages} from "monaco-editor";
+import {TEST_SITE_BASE_URL} from "./constants";
+import type {EditorId, TestMarkerData} from "./types";
 
 export function getLocaleFromUrl() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -24,13 +24,7 @@ export function isRelevantMarker(marker: editor.IMarker): boolean {
 
 type UrlConfigMap = Record<string, string | number | boolean | null | undefined>;
 
-export function createTestPageUrlUsingConfig({
-  path,
-  config,
-}: {
-  path: string;
-  config: UrlConfigMap;
-}) {
+export function createTestPageUrlUsingConfig({path, config}: {path: string; config: UrlConfigMap}) {
   const url = new URL(path, TEST_SITE_BASE_URL);
   Object.entries(config).forEach(([key, value]) => {
     if (value !== undefined && value !== null) {
@@ -89,9 +83,9 @@ export function logEvents({
 
 export function serialiseMarkers(markers: editor.IMarker[]): string {
   const markersData: TestMarkerData[] = markers.map((marker) => {
-    const { message, owner, resource, code } = marker;
+    const {message, owner, resource, code} = marker;
     const codeAsString = typeof code === "string" ? code : code?.value;
-    return { code: codeAsString, message, owner, resource: resource.path };
+    return {code: codeAsString, message, owner, resource: resource.path};
   });
   return JSON.stringify(markersData, null, 2);
 }

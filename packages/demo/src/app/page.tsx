@@ -6,7 +6,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { EditorPanelProps } from "@packages/common/src/components/EditorPanel";
 import EditorPanel from "@packages/common/src/components/EditorPanel";
 import LocaleSelect from "@packages/common/src/components/LocaleSelect";
-// eslint-disable-next-line import/no-relative-packages
 import localesMetadata from "../../../monaco-util/dist/locales/metadata.json";
 import { Colours } from "./constants";
 

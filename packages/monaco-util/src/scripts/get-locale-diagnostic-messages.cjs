@@ -36,7 +36,7 @@ async function main() {
   const localeDiagnosticMessagesFilePaths = getLocaleDiagnosticMessagesFilePaths();
   for (const diagnosticMessagesFilePath of localeDiagnosticMessagesFilePaths) {
     const locale = path.basename(path.dirname(diagnosticMessagesFilePath));
-    copyDiagnosticMessagesFromPath({ locale, diagnosticMessagesFilePath });
+    copyDiagnosticMessagesFromPath({locale, diagnosticMessagesFilePath});
     availableLocales.push(locale);
   }
 
@@ -66,9 +66,9 @@ function getLocaleDiagnosticMessagesFilePaths() {
 /**
  * @param {{locale: string, diagnosticMessagesFilePath: string}} param0
  */
-function copyDiagnosticMessagesFromPath({ locale, diagnosticMessagesFilePath }) {
+function copyDiagnosticMessagesFromPath({locale, diagnosticMessagesFilePath}) {
   const destinationPath = path.join(LOCALES_DIR, locale, DIAGNOSTIC_MESSAGES_FILE_NAME_WITH_EXT);
-  fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
+  fs.mkdirSync(path.dirname(destinationPath), {recursive: true});
   fs.copyFileSync(diagnosticMessagesFilePath, destinationPath); // NOTE: this replaces the file if it already exists
   console.log(
     `Copied "${locale}" diagnostic messages \n\tfrom "${diagnosticMessagesFilePath}" \n\tto ${destinationPath}`,
@@ -90,7 +90,7 @@ function createMetadataFile(metaData) {
  * @param {Metadata} metaData
  */
 async function updateReadmeWithMetadata(metaData) {
-  const getLocaleDisplayName = new Intl.DisplayNames(["en"], { type: "language" });
+  const getLocaleDisplayName = new Intl.DisplayNames(["en"], {type: "language"});
   const localeTableRows = metaData.availableLocales
     .map((locale, i) => `| ${i + 1} | ${locale} | ${getLocaleDisplayName.of(locale)} |`)
     .join("\n");
@@ -113,7 +113,7 @@ async function updateReadmeWithMetadata(metaData) {
     readmeContent.slice(0, startIdx) + localesSectionText + readmeContent.slice(endIdx);
 
   const prettier = require("prettier");
-  newReadmeContent = await prettier.format(newReadmeContent, { filepath: README_FILE_PATH });
+  newReadmeContent = await prettier.format(newReadmeContent, {filepath: README_FILE_PATH});
 
   fs.writeFileSync(README_FILE_PATH, newReadmeContent);
   console.log(`Updated README with metadata`);
@@ -127,21 +127,21 @@ async function createEnglishDiagnosticMessagesFile() {
 
   // save messages
   const localeFilePath = path.join(LOCALES_DIR, `en/${DIAGNOSTIC_MESSAGES_FILE_NAME_WITH_EXT}`);
-  ensureFileExistsAndWrite({ filePath: localeFilePath, content: messages });
+  ensureFileExistsAndWrite({filePath: localeFilePath, content: messages});
   console.log(`Fetched and saved "en" diagnostic messages to "${localeFilePath}"`);
 }
 
 /**
  * @param {{filePath: string, content: string}} param0
  */
-function ensureFileExistsAndWrite({ filePath, content }) {
+function ensureFileExistsAndWrite({filePath, content}) {
   if (!path.isAbsolute(filePath)) {
     throw new Error(`filePath must be absolute, but got ${filePath}`);
   }
 
   const targetDirName = path.dirname(filePath);
   if (!fs.existsSync(targetDirName)) {
-    fs.mkdirSync(targetDirName, { recursive: true });
+    fs.mkdirSync(targetDirName, {recursive: true});
   }
 
   // NOTE: this replaces the file if it already exists
@@ -176,7 +176,7 @@ function buildDiagnosticMessageOutput(messageTable) {
   /** @type {Record<string, string>} */
   const result = {};
 
-  messageTable.forEach(({ code }, name) => {
+  messageTable.forEach(({code}, name) => {
     const propName = convertPropertyName(name);
     result[createKey(propName, code)] = name;
   });

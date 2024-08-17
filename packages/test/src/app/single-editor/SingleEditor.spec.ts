@@ -1,8 +1,8 @@
-import { test } from "@playwright/test";
+import {test} from "@playwright/test";
 import SingleEditorPageObject from "./SingleEditorPageObject";
 
 // NOTE: also tests it refreshes affected model markers on locale change
-test("it can translate messages with repeated templates on locale change", async ({ page }) => {
+test("it can translate messages with repeated templates on locale change", async ({page}) => {
   const pageObject = new SingleEditorPageObject(page);
   await pageObject.openPageUsingConfig({
     locale: "en",
@@ -59,7 +59,7 @@ test("it can translate messages with repeated templates on locale change", async
   ]);
 });
 
-test("can translate messages with repeated templates on load", async ({ page }) => {
+test("can translate messages with repeated templates on load", async ({page}) => {
   const pageObject = new SingleEditorPageObject(page);
   await pageObject.openPageUsingConfig({
     locale: "fr",
@@ -79,7 +79,7 @@ test("can translate messages with repeated templates on load", async ({ page }) 
   ]);
 });
 
-test("it updates marker translations on type", async ({ page }) => {
+test("it updates marker translations on type", async ({page}) => {
   const pageObject = new SingleEditorPageObject(page);
   await pageObject.openPageUsingConfig({
     locale: "fr",
@@ -89,7 +89,7 @@ test("it updates marker translations on type", async ({ page }) => {
   await pageObject.editor.actions.setValue("");
   await pageObject.assert.actualMarkersMatch([]);
 
-  await pageObject.editor.actions.setCursorToPosition({ lineNumber: 1, column: 1 });
+  await pageObject.editor.actions.setCursorToPosition({lineNumber: 1, column: 1});
   await pageObject.editor.actions.typeValueAtCurrentCursorPosition("x");
   await pageObject.assert.actualMarkersMatch([
     {
