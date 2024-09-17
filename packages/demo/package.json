@@ -17,7 +17,7 @@
     "@packages/common": "link:../common",
     "framer-motion": "^10.18.0",
     "monaco-editor-typescript-locales": "link:../monaco-util",
-    "next": "13.5.6",
+    "next": "14.2.10",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   }
